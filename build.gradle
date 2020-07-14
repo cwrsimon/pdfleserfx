@@ -1,0 +1,32 @@
+//apply plugin: 'java'
+//apply plugin: 'jacoco'
+//apply plugin: 'application'
+plugins {
+   id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.beryx.jlink' version '2.12.0'
+}
+
+javafx {
+    version = "14.0.1"
+    modules = [ 'javafx.controls' ]
+}
+
+    group = 'de.wesim'
+
+mainClassName = 'de.wesim.pdfleserfx.Main'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+ //   testImplementation     'junit:junit:4.13'
+}
+
+jlink {
+    launcher {
+        name = 'pdfleserfx'
+    }
+}
+
