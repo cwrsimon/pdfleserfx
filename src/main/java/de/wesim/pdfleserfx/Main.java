@@ -35,35 +35,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        var p = Paths.get("C:\\Users\\cwrsi\\Downloads\\back_to_simple-000011.png");
-        var is = Files.newInputStream(p);
-        Image image = new Image(is);
+        
+        var layout = new MainLayout();
+        
+        
+        var scene = new Scene(layout, 640, 480);
 
-        ImageView iv2 = new ImageView();
-        iv2.setImage(image);
-        //iv2.setFitWidth(10);
-//         iv2.setFitHeight(0);
-        iv2.setPreserveRatio(true);
-        iv2.setSmooth(true);
-        iv2.setCache(true);
-
-        var scene = new Scene(new Group(iv2), 640, 480);
-        iv2.fitHeightProperty().bind(scene.heightProperty());
-        iv2.fitWidthProperty().bind(scene.widthProperty());
-
-        var b = new Blend();
-        b.setMode(BlendMode.MULTIPLY);
-        var rect = new ColorInput();
-//        Color.LIGHTGRAY
-        rect.setX(0);
-        rect.setY(0);
-        rect.setPaint(Color.LIGHTYELLOW);
-        rect.widthProperty().bind(scene.widthProperty());
-        rect.heightProperty().bind(scene.heightProperty());
-        b.setBottomInput(rect);
-
-        iv2.setEffect(b);
-
+        
         scene.setOnMouseClicked(e -> {
 
             System.out.println("CC: " + e.getClickCount());
@@ -86,4 +64,5 @@ public class Main extends Application {
         stage.show();
     }
 
+    
 }
