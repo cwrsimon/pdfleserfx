@@ -10,50 +10,69 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import javafx.beans.binding.Bindings;
 import javafx.event.EventType;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 /**
  *
  * @author cwrsi
  */
 public class MainLayout extends BorderPane {
-    
+
+    private final ToolBar toolbar;
+    private final ColorPicker picker;
+
     public MainLayout() throws IOException {
-      
-         var p = Paths.get("C:\\Users\\cwrsi\\Downloads\\back_to_simple-000011.png");
+
+        var p = Paths.get("C:\\Users\\cwrsi\\Downloads\\back_to_simple-000011.png");
         var is = Files.newInputStream(p);
-//        var g = new Group();
+
         var g = new StackPane();
-//var g = new StackPane();
         //
         var iv2 = new DisplayedImage(is);
-        g.getChildren().add(new Group(iv2));
-        
-//        iv2.fitHeightProperty().bind(this.heightProperty());
-       
+        var contain = new HBox(iv2);
+        contain.setAlignment(Pos.CENTER);
+        g.getChildren().add(contain);
 
-        ToolBar tb = new ToolBar();
-        Button b = new Button("Bla");
-        tb.getItems().add(b);
-        setTop(b);
-//        setCenter(new Group(iv2));
-        setCenter(g);
-//        iv2.setFitHeight(USE_COMPUTED_SIZE);
-//                iv2.setFitWidth(USE_COMPUTED_SIZE);
- iv2.fitWidthProperty().bind(this.widthProperty());
-    var back_reference = this;
-        iv2.fitHeightProperty().bind(Bindings.createDoubleBinding(() -> {
+        this.toolbar = new ToolBar();
+        this.picker = new ColorPicker(Color.web("#f3efc1"));
+        this.picker.valueProperty().bindBidirectional(iv2.getColorProperty());
+        var b = new Button("Bla");
+        toolbar.getItems().add(b);
+        toolbar.getItems().add(this.picker);
         
+        setTop(this.toolbar);
+        setCenter(g);
+        
+        var back_reference = this;
+
+        iv2.fitWidthProperty().bind(back_reference.widthProperty());
+        iv2.fitHeightProperty().bind(Bindings.createDoubleBinding(() -> {
+
             var border_height = back_reference.heightProperty().get();
-            var tb_height = tb.heightProperty().get();
+            var tb_height = toolbar.heightProperty().get();
+
             return border_height - tb_height;
-            
-        }, back_reference.heightProperty(), tb.heightProperty()));
+
+        }, back_reference.heightProperty(), toolbar.heightProperty()));
+        
+//                System.out.println("Image With:" + iv2.getViewport().getWidth());
+
     }
-    
+
+    public void switchToFullscreen(boolean fullscreen) {
+        if (fullscreen) {
+            setTop(null);
+        } else {
+            setTop(this.toolbar);
+        }
+    }
 }
