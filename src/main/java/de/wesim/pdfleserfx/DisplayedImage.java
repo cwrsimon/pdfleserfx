@@ -5,23 +5,14 @@
  */
 package de.wesim.pdfleserfx;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorInput;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 /**
  *
@@ -31,22 +22,22 @@ public class DisplayedImage extends ImageView {
 
     private ColorInput rect;
     
-    private SimpleObjectProperty<Color> colorProperty = 
+    private final SimpleObjectProperty<Color> colorProperty = 
             new SimpleObjectProperty<>(Color.web("#f3efc1"));
     
-    public DisplayedImage(InputStream stream) {
+    public DisplayedImage() {
 
-        Image image = new Image(stream);
+//        Image image = new Image(stream);
         
-        setImage(image);
+//        setImage(image);
         setPreserveRatio(true);
         setSmooth(true);
         setCache(true);
         
         var blend = createBlend();
-        getImage().widthProperty().addListener((obs, oldV, newV) -> {
-            System.out.println("NewV:" + newV);
-        });
+//        getImage().widthProperty().addListener((obs, oldV, newV) -> {
+//            System.out.println("NewV:" + newV);
+//        });
         fitWidthProperty().addListener((obs, oldV, newV) -> {
             System.out.println("NewV:" + newV);
         });

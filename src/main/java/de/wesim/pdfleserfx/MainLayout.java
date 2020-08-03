@@ -29,15 +29,16 @@ public class MainLayout extends BorderPane {
 
     private final ToolBar toolbar;
     private final ColorPicker picker;
+    private final DisplayedImage iv2;
 
     public MainLayout() throws IOException {
 
-        var p = Paths.get("C:\\Users\\cwrsi\\Downloads\\back_to_simple-000011.png");
-        var is = Files.newInputStream(p);
+//        var p = Paths.get("C:\\Users\\cwrsi\\Downloads\\back_to_simple-000011.png");
+//        var is = Files.newInputStream(p);
 
         var g = new StackPane();
         //
-        var iv2 = new DisplayedImage(is);
+        this.iv2 = new DisplayedImage();
         var contain = new HBox(iv2);
         contain.setAlignment(Pos.CENTER);
         g.getChildren().add(contain);
@@ -64,8 +65,6 @@ public class MainLayout extends BorderPane {
 
         }, back_reference.heightProperty(), toolbar.heightProperty()));
         
-//                System.out.println("Image With:" + iv2.getViewport().getWidth());
-
     }
 
     public void switchToFullscreen(boolean fullscreen) {
@@ -75,4 +74,10 @@ public class MainLayout extends BorderPane {
             setTop(this.toolbar);
         }
     }
+
+    public DisplayedImage getIv2() {
+        return iv2;
+    }
+    
+    
 }

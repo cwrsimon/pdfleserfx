@@ -5,22 +5,16 @@
  */
 package de.wesim.pdfleserfx;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.ColorInput;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -29,17 +23,30 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
+    
+    private int image_index = 0;
+    
+    
+    private static final String[] image_list = new String[]{
+        "C:\\Users\\cwrsi\\Downloads\\back_to_simple-000011.png",
+        "C:\\Users\\cwrsi\\Downloads\\back_to_simple-000012.png",
+        "C:\\Users\\cwrsi\\Downloads\\back_to_simple-000013.png",
+        "C:\\Users\\cwrsi\\Downloads\\back_to_simple-000014.png"
+
+    };
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         launch();
     }
+    private MainLayout layout;
 
     @Override
     public void start(Stage stage) throws Exception {
 
-        var layout = new MainLayout();
+        this.layout = new MainLayout();
 
         var scene = new Scene(layout, 640, 480);
 
@@ -64,9 +71,13 @@ public class Main extends Application {
                     var right_side = current_width / 3.0 * 2.0;
                     if (screenx <= left_side) {
                         System.out.println("Linke Seite");
+                        image_index++;
+                        loadImage();
                     } else if (screenx >= right_side) {
                         System.out.println("Rechte Seite");
-
+                        image_index--;
+                        if (image_index < 0) image_index = 0;
+                        loadImage();
                     } else {
                         System.out.println("Mitte");
                     }
@@ -94,6 +105,20 @@ public class Main extends Application {
         stage.setScene(scene);
 
         stage.show();
+        
+        loadImage();
+    }
+    
+    private void loadImage() {
+        var path = Paths.get(image_list[image_index]);
+        InputStream is = null;
+        try {
+            is = Files.newInputStream(path);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return;
+        }
+        this.layout.getIv2().setImage(new Image(is));
     }
 
 }
