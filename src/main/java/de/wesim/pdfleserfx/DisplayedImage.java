@@ -5,7 +5,11 @@
  */
 package de.wesim.pdfleserfx;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
@@ -64,5 +68,26 @@ public class DisplayedImage extends ImageView {
 
     public SimpleObjectProperty<Color> getColorProperty() {
         return colorProperty;
+    }
+    
+    public void loadFirstImage() {
+        var path = ImageProvider.getInstance().getFirstImage();
+        loadImage(path);
+    }
+    
+    public void loadNextImage() {
+        var path = ImageProvider.getInstance().getNextImage();
+        loadImage(path);
+    }
+    
+    public void loadPreviousImage() {
+        var path = ImageProvider.getInstance().getPrevImage();
+        loadImage(path);
+    }
+    
+    // TODO In einen Service verlagern!
+    private void loadImage(Path path) {
+        var task = new LoadImageTask(path, image -> setImage(image));
+        task.run();
     }
 }
