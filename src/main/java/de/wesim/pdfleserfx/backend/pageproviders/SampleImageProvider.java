@@ -3,20 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.wesim.pdfleserfx;
+package de.wesim.pdfleserfx.backend.pageproviders;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javafx.scene.image.Image;
+import de.wesim.pdfleserfx.backend.pageproviders.IPageProvider;
 
 /**
  *
  * @author cwrsi
  */
 // TODO Generisch für PDF und andere Formate machen
-// TODO Statt Path lieber Images zurückgeben
 // TODO An dieser Stelle cachen und ein paar Seiten vorausladen..
 // TODO Hashmap von Index -> Image anlegen !
-public class ImageProvider {
+public class SampleImageProvider implements IPageProvider {
     
     private int image_index = 0;
     
@@ -30,32 +33,34 @@ public class ImageProvider {
     };
     
     
-    private static ImageProvider _instance;
     
-    private ImageProvider() {
+    public SampleImageProvider() {
         
     }
+   
     
-    public static ImageProvider getInstance() {
-        if (_instance == null) {
-            _instance = new ImageProvider();
-        }
-        return _instance;
-    }
-    
-    
-    public Path getFirstImage() {
+    @Override
+    public Image getFirstImage() throws IOException {
         image_index = 0;
-        return Paths.get(image_list[image_index]);
+        return readImageFromPath(Paths.get(image_list[image_index]));
     }
     
-    public Path getNextImage() {
+    @Override
+    public Image getNextImage() throws IOException {
         image_index++;
-        return Paths.get(image_list[image_index]);
+        return readImageFromPath(Paths.get(image_list[image_index]));
     }
     
-    public Path getPrevImage() {
+    @Override
+    public Image getPrevImage() throws IOException {
         image_index--;
-        return Paths.get(image_list[image_index]);
+        return readImageFromPath(Paths.get(image_list[image_index]));
+    }
+    
+    private Image readImageFromPath(Path path) throws IOException {
+            try (var is = Files.newInputStream(path)) {
+            return new Image(is);
+            }
+        
     }
 }

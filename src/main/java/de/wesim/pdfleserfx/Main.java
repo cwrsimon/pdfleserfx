@@ -5,6 +5,7 @@
  */
 package de.wesim.pdfleserfx;
 
+import de.wesim.pdfleserfx.frontend.mainview.MainLayout;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -56,13 +57,11 @@ public class Main extends Application {
                     var left_side = current_width / 3.0;
                     var right_side = current_width / 3.0 * 2.0;
                     if (screenx <= left_side) {
-                        System.out.println("Linke Seite");
-                        layout.getIv2().loadPreviousImage();
+                        layout.flipLeft();
 
                     } else if (screenx >= right_side) {
-                        System.out.println("Rechte Seite");
-                        layout.getIv2().loadNextImage();
-
+                        layout.flipRight();
+                        System.out.println("Rechts");
                     } else {
                         System.out.println("Mitte");
                     }
@@ -88,10 +87,9 @@ public class Main extends Application {
 //            }
         });
         stage.setScene(scene);
-
         stage.show();
         
-        layout.getIv2().loadFirstImage();
+        layout.loadFirst();
     }
     
     

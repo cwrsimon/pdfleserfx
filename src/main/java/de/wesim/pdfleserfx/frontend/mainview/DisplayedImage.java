@@ -3,14 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.wesim.pdfleserfx;
+package de.wesim.pdfleserfx.frontend.mainview;
 
+import de.wesim.pdfleserfx.helpers.ThrowingSupplier;
+import de.wesim.pdfleserfx.backend.pageproviders.IPageProvider;
+import de.wesim.pdfleserfx.backend.pageproviders.SampleImageProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Supplier;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorInput;
@@ -28,12 +34,12 @@ public class DisplayedImage extends ImageView {
     
     private final SimpleObjectProperty<Color> colorProperty = 
             new SimpleObjectProperty<>(Color.web("#f3efc1"));
+    private IPageProvider imageProvider;
+    
+    private SimpleIntegerProperty left_cut_property = new SimpleIntegerProperty();
     
     public DisplayedImage() {
-
-//        Image image = new Image(stream);
         
-//        setImage(image);
         setPreserveRatio(true);
         setSmooth(true);
         setCache(true);
@@ -50,7 +56,15 @@ public class DisplayedImage extends ImageView {
         colorProperty.addListener((o,old, newV) -> {
             this.rect.setPaint(newV);
         });
-        
+     
+//        Rectangle2D viewportRect = new Rectangle2D(40, 35, 110, 110);
+//        //viewportRect.
+//        setViewport(viewportRect);
+    }
+
+    DisplayedImage(SampleImageProvider imageProvider) {
+        this();
+        this.imageProvider = imageProvider;
     }
     
     private Blend createBlend() {
@@ -71,23 +85,25 @@ public class DisplayedImage extends ImageView {
     }
     
     public void loadFirstImage() {
-        var path = ImageProvider.getInstance().getFirstImage();
-        loadImage(path);
+        final ThrowingSupplier<Image> getter = () -> imageProvider.getFirstImage();
+        loadImage(getter);
     }
     
     public void loadNextImage() {
-        var path = ImageProvider.getInstance().getNextImage();
-        loadImage(path);
+        final ThrowingSupplier<Image> getter = () -> imageProvider.getNextImage();
+        loadImage(getter);
     }
     
     public void loadPreviousImage() {
-        var path = ImageProvider.getInstance().getPrevImage();
-        loadImage(path);
+        final ThrowingSupplier<Image> getter = () -> imageProvider.getPrevImage();
+        loadImage( getter );
     }
     
     // TODO In einen Service verlagern!
-    private void loadImage(Path path) {
-        var task = new LoadImageTask(path, image -> setImage(image));
+    private void loadImage(ThrowingSupplier<Image> getter ) {
+        var task = new LoadImageTask(getter, image -> setImage(image));
         task.run();
     }
 }
+
+

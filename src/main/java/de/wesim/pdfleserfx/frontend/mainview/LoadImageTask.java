@@ -3,13 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.wesim.pdfleserfx;
+package de.wesim.pdfleserfx.frontend.mainview;
 
+import de.wesim.pdfleserfx.helpers.ThrowingSupplier;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -20,25 +22,17 @@ import javafx.scene.image.Image;
  */
 public class LoadImageTask extends Task<Image> {
 
-    private final Path path;
+    private final ThrowingSupplier<Image> getter;
     private final Consumer<Image> callback;
 
-    public LoadImageTask(Path path, Consumer<Image> callback) {
-        this.path = path;
+    public LoadImageTask(ThrowingSupplier<Image> getter, Consumer<Image> callback) {
+        this.getter = getter;
         this.callback = callback;
     }
-    
+    // TODO Eien Error Handler hinzfügen!
     @Override
     protected Image call() throws Exception {
-        InputStream is = null;
-        try {
-            is = Files.newInputStream(path);
-            return new Image(is);
-        } catch (IOException ex) {
-            // TODO Do something smart here
-            ex.printStackTrace();
-            return null;
-        }
+        return getter.get();
     }
 
     @Override
