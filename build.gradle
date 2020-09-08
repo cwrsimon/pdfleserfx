@@ -9,7 +9,7 @@ plugins {
 
 javafx {
     version = "14.0.1"
-    modules = [ 'javafx.controls' ]
+    modules = [ 'javafx.controls', 'javafx.swing' ]
 }
 
     group = 'de.wesim'
@@ -21,6 +21,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
+    compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.21'
+
  //   testImplementation     'junit:junit:4.13'
 }
 

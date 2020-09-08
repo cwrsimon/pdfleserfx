@@ -32,7 +32,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-
+ 
         this.layout = new MainLayout();
 
         var scene = new Scene(layout, 640, 480);

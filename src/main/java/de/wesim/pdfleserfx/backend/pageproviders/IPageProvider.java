@@ -6,7 +6,9 @@
 package de.wesim.pdfleserfx.backend.pageproviders;
 
 import java.io.IOException;
+import java.util.Optional;
 import javafx.scene.image.Image;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
  *
@@ -14,10 +16,9 @@ import javafx.scene.image.Image;
  */
 public interface IPageProvider {
 
-    Image getFirstImage() throws IOException;
+    public Optional<Integer> getNumberOfPages();
 
-    Image getNextImage() throws IOException;
-
-    Image getPrevImage() throws IOException;
+    
+    public Image getPageAsImage(int page_number) throws IOException;
     
 }

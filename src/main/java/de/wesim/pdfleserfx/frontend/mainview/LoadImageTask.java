@@ -29,7 +29,7 @@ public class LoadImageTask extends Task<Image> {
         this.getter = getter;
         this.callback = callback;
     }
-    // TODO Eien Error Handler hinzfügen!
+    // TODO Add error handler
     @Override
     protected Image call() throws Exception {
         return getter.get();

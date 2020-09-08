@@ -5,8 +5,9 @@
  */
 package de.wesim.pdfleserfx.frontend.mainview;
 
-import de.wesim.pdfleserfx.backend.pageproviders.SampleImageProvider;
+import de.wesim.pdfleserfx.backend.pageproviders.PDFPageProvider;
 import java.io.IOException;
+import java.nio.file.Paths;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -38,7 +39,7 @@ public class MainLayout extends BorderPane {
 
         var g = new StackPane();
         //
-        this.iv2 = new DisplayedImage(new SampleImageProvider());
+        this.iv2 = new DisplayedImage(new PDFPageProvider(Paths.get("/home/papa/Downloads/Instruction_manual.pdf")));
         var contain = new HBox(iv2);
         contain.setAlignment(Pos.CENTER);
         g.getChildren().add(contain);
@@ -75,7 +76,7 @@ public class MainLayout extends BorderPane {
             if (right_value != null && !right_value.isBlank()) {
                 right = Integer.valueOf(right_value);
             }
-            
+            if (iv2.getImage() == null) return null;
             var width = iv2.getImage().getWidth();
             var height = iv2.getImage().getHeight();
             return new Rectangle2D(
@@ -104,7 +105,7 @@ public class MainLayout extends BorderPane {
         setCenter(g);
 
         var back_reference = this;
-
+        // TODO Allow user to "toggle" fitWidth/fitHeight
         iv2.fitWidthProperty().bind(back_reference.widthProperty());
         iv2.fitHeightProperty().bind(Bindings.createDoubleBinding(() -> {
 
@@ -114,8 +115,6 @@ public class MainLayout extends BorderPane {
             return border_height - tb_height;
 
         }, back_reference.heightProperty(), toolbar.heightProperty()));
-//        iv2.setViewport(new Rectangle2D(
-//                    500, 500,500,500 ));
     }
 
     public void switchToFullscreen(boolean fullscreen) {

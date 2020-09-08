@@ -10,15 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javafx.scene.image.Image;
-import de.wesim.pdfleserfx.backend.pageproviders.IPageProvider;
+import java.util.Optional;
 
 /**
  *
  * @author cwrsi
  */
-// TODO Generisch für PDF und andere Formate machen
-// TODO An dieser Stelle cachen und ein paar Seiten vorausladen..
-// TODO Hashmap von Index -> Image anlegen !
 public class SampleImageProvider implements IPageProvider {
     
     private int image_index = 0;
@@ -39,28 +36,21 @@ public class SampleImageProvider implements IPageProvider {
     }
    
     
-    @Override
-    public Image getFirstImage() throws IOException {
-        image_index = 0;
-        return readImageFromPath(Paths.get(image_list[image_index]));
-    }
-    
-    @Override
-    public Image getNextImage() throws IOException {
-        image_index++;
-        return readImageFromPath(Paths.get(image_list[image_index]));
-    }
-    
-    @Override
-    public Image getPrevImage() throws IOException {
-        image_index--;
-        return readImageFromPath(Paths.get(image_list[image_index]));
-    }
     
     private Image readImageFromPath(Path path) throws IOException {
             try (var is = Files.newInputStream(path)) {
             return new Image(is);
             }
         
+    }
+
+    @Override
+    public Optional<Integer> getNumberOfPages() {
+        return Optional.of(image_list.length);
+    }
+
+    @Override
+    public Image getPageAsImage(int page_number) throws IOException {
+        return readImageFromPath(Paths.get(image_list[page_number]));
     }
 }
