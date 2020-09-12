@@ -5,8 +5,8 @@
  */
 package de.wesim.pdfleserfx.frontend.mainview;
 
-import de.wesim.pdfleserfx.helpers.ThrowingSupplier;
 import de.wesim.pdfleserfx.backend.pageproviders.IPageProvider;
+import de.wesim.pdfleserfx.helpers.ThrowingSupplier;
 import de.wesim.pdfleserfx.backend.pageproviders.SampleImageProvider;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,10 +62,6 @@ public class DisplayedImage extends ImageView {
 //        setViewport(viewportRect);
     }
 
-    DisplayedImage(IPageProvider imageProvider) {
-        this();
-        this.imageProvider = imageProvider;
-    }
     
     private Blend createBlend() {
         var b = new Blend();
@@ -153,6 +149,12 @@ public class DisplayedImage extends ImageView {
         });
         task.run();
     }
+
+    public void setImageProvider(IPageProvider imageProvider) {
+        this.imageProvider = imageProvider;
+    }
+    
+    
 }
 
 

@@ -7,6 +7,7 @@ package de.wesim.pdfleserfx.frontend.mainview;
 
 import de.wesim.pdfleserfx.backend.pageproviders.PDFPageProvider;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -34,12 +35,17 @@ public class MainLayout extends BorderPane {
     private final DisplayedImage iv2;
     
     
+    public void openFile(Path path) {
+        var content_provider = new PDFPageProvider(path);
+        this.iv2.setImageProvider(content_provider);
+    }
+    
 
     public MainLayout() throws IOException {
 
         var g = new StackPane();
         //
-        this.iv2 = new DisplayedImage(new PDFPageProvider(Paths.get("/home/papa/Downloads/Instruction_manual.pdf")));
+        this.iv2 = new DisplayedImage();
         var contain = new HBox(iv2);
         contain.setAlignment(Pos.CENTER);
         g.getChildren().add(contain);
@@ -52,10 +58,10 @@ public class MainLayout extends BorderPane {
         toolbar.getItems().add(b);
         toolbar.getItems().add(this.picker);
         
-        var top_cut = new TextField(); top_cut.setMaxWidth(50); top_cut.setPromptText("Top");
-        var bottom_cut = new TextField(); bottom_cut.setMaxWidth(50); bottom_cut.setPromptText("Bottom");
-        var left_cut = new TextField(); left_cut.setMaxWidth(50);left_cut.setPromptText("Left");
-        var right_cut = new TextField(); right_cut.setMaxWidth(50);right_cut.setPromptText("Right");
+        var top_cut = new TextField(); top_cut.setPrefWidth(50); top_cut.setPromptText("Top");
+        var bottom_cut = new TextField(); bottom_cut.setPrefWidth(50); bottom_cut.setPromptText("Bottom");
+        var left_cut = new TextField(); left_cut.setPrefWidth(50);left_cut.setPromptText("Left");
+        var right_cut = new TextField(); right_cut.setPrefWidth(50);right_cut.setPromptText("Right");
         
         iv2.viewportProperty().bind(Bindings.createObjectBinding(() -> {
             var top_value = top_cut.textProperty().get();

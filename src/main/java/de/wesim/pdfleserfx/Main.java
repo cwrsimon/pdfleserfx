@@ -6,6 +6,7 @@
 package de.wesim.pdfleserfx;
 
 import de.wesim.pdfleserfx.frontend.mainview.MainLayout;
+import java.nio.file.Paths;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -26,13 +27,14 @@ public class Main extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
+    
     private MainLayout layout;
 
+    
     @Override
     public void start(Stage stage) throws Exception {
- 
         this.layout = new MainLayout();
 
         var scene = new Scene(layout, 640, 480);
@@ -72,7 +74,6 @@ public class Main extends Application {
             if (e.getButton() == MouseButton.SECONDARY) {
                 ContextMenu cm = new ContextMenu(new MenuItem("Quit"));
                 cm.show(scene.getWindow(), e.getScreenX(), e.getScreenY());
-                return;
             }
         });
 
@@ -89,6 +90,13 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
         
+         // we should have at least on parameter
+        var filename = getParameters().getRaw().get(0);
+        var path = Paths.get(filename);
+        // TODO Issue a warning if file does not exist
+        //getParameters().getRaw().forEach(System.out::println);
+       
+        layout.openFile(path);
         layout.loadFirst();
     }
     
