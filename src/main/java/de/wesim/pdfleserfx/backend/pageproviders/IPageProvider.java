@@ -8,7 +8,6 @@ package de.wesim.pdfleserfx.backend.pageproviders;
 import java.io.IOException;
 import java.util.Optional;
 import javafx.scene.image.Image;
-import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
  *

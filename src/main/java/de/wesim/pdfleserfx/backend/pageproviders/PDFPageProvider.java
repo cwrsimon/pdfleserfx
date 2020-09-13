@@ -44,7 +44,6 @@ public class PDFPageProvider implements IPageProvider {
 
             PDFRenderer renderer = new PDFRenderer(document);
             renderer.setSubsamplingAllowed(false);
-               var page = document.getPage(0);
                     // TODO View-Rendering
                 var image = renderer.renderImageWithDPI(page_number, dpi, ImageType.RGB);
                     //ImageIOUtil.writeImage(image, fileName, dpi, quality);

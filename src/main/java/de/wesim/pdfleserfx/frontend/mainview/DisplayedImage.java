@@ -7,16 +7,11 @@ package de.wesim.pdfleserfx.frontend.mainview;
 
 import de.wesim.pdfleserfx.backend.pageproviders.IPageProvider;
 import de.wesim.pdfleserfx.helpers.ThrowingSupplier;
-import de.wesim.pdfleserfx.backend.pageproviders.SampleImageProvider;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.function.Supplier;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Rectangle2D;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorInput;
@@ -31,38 +26,34 @@ import javafx.scene.paint.Color;
 public class DisplayedImage extends ImageView {
 
     private ColorInput rect;
-    
-    private final SimpleObjectProperty<Color> colorProperty = 
-            new SimpleObjectProperty<>(Color.web("#f3efc1"));
+
+    private final SimpleObjectProperty<Color> colorProperty
+            = new SimpleObjectProperty<>(Color.web("#f3efc1"));
     private IPageProvider imageProvider;
     private Integer numer_of_pages = -1;
-    private Integer current_page = -1;
-        
+
+    private final SimpleIntegerProperty pageProperty = new SimpleIntegerProperty(0);
+    
     public DisplayedImage() {
-        
+
         setPreserveRatio(true);
         setSmooth(true);
         setCache(true);
-        
+
         var blend = createBlend();
-//        getImage().widthProperty().addListener((obs, oldV, newV) -> {
-//            System.out.println("NewV:" + newV);
-//        });
-        fitWidthProperty().addListener((obs, oldV, newV) -> {
-            System.out.println("NewV:" + newV);
-        });
         setEffect(blend);
 
-        colorProperty.addListener((o,old, newV) -> {
+        colorProperty.addListener((o, old, newV) -> {
             this.rect.setPaint(newV);
         });
-     
-//        Rectangle2D viewportRect = new Rectangle2D(40, 35, 110, 110);
-//        //viewportRect.
-//        setViewport(viewportRect);
+
+        pageProperty.addListener((obs, oldV, newV) -> {
+            
+        System.out.println(newV);
+            loadImage(newV.intValue());
+    });
     }
 
-    
     private Blend createBlend() {
         var b = new Blend();
         b.setMode(BlendMode.MULTIPLY);
@@ -70,8 +61,6 @@ public class DisplayedImage extends ImageView {
         rect.setX(0);
         rect.setY(0);
         rect.setPaint(colorProperty.getValue());
-//        rect.widthProperty().bind(fitWidthProperty());
-//        rect.heightProperty().bind(fitHeightProperty());
         b.setBottomInput(rect);
         return b;
     }
@@ -79,60 +68,63 @@ public class DisplayedImage extends ImageView {
     public SimpleObjectProperty<Color> getColorProperty() {
         return colorProperty;
     }
-    
+
     public void loadFirstImage() {
         var number_of_pages_opt = imageProvider.getNumberOfPages();
         if (number_of_pages_opt.isPresent()) {
             this.numer_of_pages = number_of_pages_opt.get();
         }
         if (this.numer_of_pages != -1) {
-            this.current_page = 0;
-            loadImage();
+            pageProperty.set(1);
         }
     }
-    
+
     public void loadNextImage() {
-        if ( this.current_page > -1 ) {
-            var candidate = this.current_page + 1;
-            if (candidate < this.numer_of_pages) {
-                this.current_page = candidate;
+        var current_page = pageProperty.get();
+        if (current_page > -1) {
+            var candidate = current_page + 1;
+            if (candidate <= this.numer_of_pages) {
+                pageProperty.set(candidate);
             }
         }
-        loadImage();
     }
-    
+
     public void loadPreviousImage() {
-        if ( this.current_page > -1 ) {
-            var candidate = this.current_page - 1;
-            if (candidate > -1) {
-                this.current_page = candidate;
+        var current_page = pageProperty.get();
+        if (current_page > -1) {
+            var candidate = current_page - 1;
+            if (candidate > 0) {
+                pageProperty.set(candidate);
             }
         }
-        loadImage();
     }
-    
-    // TODO In einen Service verlagern!
-    private void loadImage() {
-        final ThrowingSupplier<Image> getter = () -> imageProvider.getPageAsImage(this.current_page);
+
+    private void loadImage(int page) {
+        System.out.println("Loading page:" + page);
+        final ThrowingSupplier<Image> getter = () -> imageProvider.getPageAsImage((page - 1));
         var task = new LoadImageTask(getter, image -> {
             setImage(image);
             rect.heightProperty().unbind();
             rect.widthProperty().unbind();
-            /* Irgendwie nachimplementieren 
-            
-        double w = 0;
-        double h = 0;
-        if (localViewport != null && localViewport.getWidth() > 0 && localViewport.getHeight() > 0) {
-            w = localViewport.getWidth();
-            h = localViewport.getHeight();
-        } else if (localImage != null) {
-            w = localImage.getWidth();
-            h = localImage.getHeight();
-        }
+            rect.heightProperty().bind(Bindings.createDoubleBinding(() -> {
+                var new_dimensions
+                        = calcHeightWidth(image.getWidth(), image.getHeight(), fitWidthProperty().get(), fitHeightProperty().get());
+                return new_dimensions[1];
+            }, fitWidthProperty(), fitHeightProperty()));
 
-        double localFitWidth = getFitWidth();
-        double localFitHeight = getFitHeight();
+            rect.widthProperty().bind(Bindings.createDoubleBinding(() -> {
+                var new_dimensions
+                        = calcHeightWidth(image.getWidth(), image.getHeight(), fitWidthProperty().get(), fitHeightProperty().get());
+                return new_dimensions[0];
+            }, fitWidthProperty(), fitHeightProperty()));
+        });
+        task.run();
+    }
 
+    /* Borrowed from
+            https://github.com/javafxports/openjdk-jfx/blob/develop/modules/javafx.graphics/src/main/java/javafx/scene/image/ImageView.java
+     */
+    private double[] calcHeightWidth(double w, double h, double localFitWidth, double localFitHeight) {
         if (isPreserveRatio() && w > 0 && h > 0 && (localFitWidth > 0 || localFitHeight > 0)) {
             if (localFitWidth <= 0 || (localFitHeight > 0 && localFitWidth * h > localFitHeight * w)) {
                 w = w * localFitHeight / h;
@@ -142,19 +134,15 @@ public class DisplayedImage extends ImageView {
                 w = localFitWidth;
             }
         }
-            https://github.com/javafxports/openjdk-jfx/blob/develop/modules/javafx.graphics/src/main/java/javafx/scene/image/ImageView.java
-            */
-            rect.heightProperty().bind(image.heightProperty());
-            rect.widthProperty().bind(image.widthProperty());
-        });
-        task.run();
+        return new double[]{w, h};
     }
 
     public void setImageProvider(IPageProvider imageProvider) {
         this.imageProvider = imageProvider;
     }
-    
-    
+
+    Property<Number> pageProperty() {
+        return this.pageProperty;
+    }
+
 }
-
-

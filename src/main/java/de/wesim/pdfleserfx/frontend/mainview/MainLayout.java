@@ -8,21 +8,21 @@ package de.wesim.pdfleserfx.frontend.mainview;
 import de.wesim.pdfleserfx.backend.pageproviders.PDFPageProvider;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.util.converter.NumberStringConverter;
 
 /**
  *
@@ -52,12 +52,34 @@ public class MainLayout extends BorderPane {
 
         this.toolbar = new ToolBar();
         this.picker = new ColorPicker(Color.web("#f3efc1"));
+        this.picker.setPrefWidth(50);
         this.picker.valueProperty().bindBidirectional(iv2.getColorProperty());
-        var b = new Button("Quit");
-        b.setOnAction(e-> Platform.exit());
-        toolbar.getItems().add(b);
-        toolbar.getItems().add(this.picker);
+        var open_button = new Button("Open");
+        open_button.setPrefWidth(50);
+        open_button.setOnAction( e->  {
         
+        });
+        
+        var quit_button = new Button("Quit");
+        quit_button.setPrefWidth(50);
+        quit_button.setOnAction(e-> Platform.exit());
+        
+        toolbar.getItems().add(open_button);
+        toolbar.getItems().add(quit_button);
+        toolbar.getItems().add(this.picker);
+        toolbar.getItems().add(new Separator());
+        
+        // TODO Add arrows for prev/next page
+        var page_selector = new TextField("Page");
+        //page_selector.
+        page_selector.setPrefWidth(50);
+//        page_selector.setEditable(true);
+//        page_selector.getValueFactory().valueProperty().bindBidirectional(this.iv2.pageProperty());
+        Bindings.bindBidirectional(page_selector.textProperty(), 
+                this.iv2.pageProperty(), new NumberStringConverter());
+        toolbar.getItems().add(page_selector);
+        toolbar.getItems().add(new Separator());
+
         var top_cut = new TextField(); top_cut.setPrefWidth(50); top_cut.setPromptText("Top");
         var bottom_cut = new TextField(); bottom_cut.setPrefWidth(50); bottom_cut.setPromptText("Bottom");
         var left_cut = new TextField(); left_cut.setPrefWidth(50);left_cut.setPromptText("Left");
