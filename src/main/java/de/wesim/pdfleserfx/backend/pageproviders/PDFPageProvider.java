@@ -18,15 +18,16 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 public class PDFPageProvider implements IPageProvider {
 
     private final Path pdf_file;
-    private final int dpi;
+//    private final int dpi;
 
     
     public PDFPageProvider(Path pdf_file) {
         this.pdf_file = pdf_file;
-        // TODO Make this configurable
-        this.dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+        // TODO Pre-Configure this when starting the application
+     //   this.dpi = Toolkit.getDefaultToolkit().getScreenResolution();
     }
     
+    @Override
     public Optional<Integer> getNumberOfPages() {
         try (PDDocument document = PDDocument.load(pdf_file.toFile())) {
             return Optional.of(document.getNumberOfPages());
@@ -39,14 +40,13 @@ public class PDFPageProvider implements IPageProvider {
 
     
     @Override
-    public Image getPageAsImage(int page_number) throws IOException {
+    public Image getPageAsImage(int page_number, int dpi) throws IOException {
     try (PDDocument document = PDDocument.load(pdf_file.toFile())) {
 
             PDFRenderer renderer = new PDFRenderer(document);
             renderer.setSubsamplingAllowed(false);
                     // TODO View-Rendering
                 var image = renderer.renderImageWithDPI(page_number, dpi, ImageType.RGB);
-                    //ImageIOUtil.writeImage(image, fileName, dpi, quality);
                 return SwingFXUtils.toFXImage(image, null);
         }
     }

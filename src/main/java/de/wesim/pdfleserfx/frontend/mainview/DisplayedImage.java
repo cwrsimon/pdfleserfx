@@ -11,7 +11,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorInput;
@@ -32,6 +31,7 @@ public class DisplayedImage extends ImageView {
     private IPageProvider imageProvider;
     private Integer numer_of_pages = -1;
 
+    private final SimpleIntegerProperty dpiProperty = new SimpleIntegerProperty(96);
     private final SimpleIntegerProperty pageProperty = new SimpleIntegerProperty(0);
     
     public DisplayedImage() {
@@ -47,11 +47,20 @@ public class DisplayedImage extends ImageView {
             this.rect.setPaint(newV);
         });
 
-        pageProperty.addListener((obs, oldV, newV) -> {
-            
-        System.out.println(newV);
-            loadImage(newV.intValue());
-    });
+        dpiProperty.addListener((obs, oldV, newV) -> {
+            refresh();
+        });
+
+        pageProperty.addListener((obs, oldV, newV ) -> {
+            if (newV.intValue() < 1) return;
+            System.out.println(oldV + ";" + newV);
+            loadImage();
+        });
+
+    }
+
+    public void refresh() {
+        loadImage();
     }
 
     private Blend createBlend() {
@@ -70,11 +79,14 @@ public class DisplayedImage extends ImageView {
     }
 
     public void loadFirstImage() {
+        pageProperty.set(0);
         var number_of_pages_opt = imageProvider.getNumberOfPages();
         if (number_of_pages_opt.isPresent()) {
             this.numer_of_pages = number_of_pages_opt.get();
         }
+        System.out.println("page count:" + this.numer_of_pages);
         if (this.numer_of_pages != -1) {
+            System.out.println("Hey");
             pageProperty.set(1);
         }
     }
@@ -99,9 +111,11 @@ public class DisplayedImage extends ImageView {
         }
     }
 
-    private void loadImage(int page) {
+    private void loadImage() {
+        var page = pageProperty.get();
         System.out.println("Loading page:" + page);
-        final ThrowingSupplier<Image> getter = () -> imageProvider.getPageAsImage((page - 1));
+
+        final ThrowingSupplier<Image> getter = () -> imageProvider.getPageAsImage((page - 1), dpiProperty.get());
         var task = new LoadImageTask(getter, image -> {
             setImage(image);
             rect.heightProperty().unbind();
@@ -145,4 +159,6 @@ public class DisplayedImage extends ImageView {
         return this.pageProperty;
     }
 
-}
+    Property<Number> dpiProperty() {
+        return this.dpiProperty;
+    }

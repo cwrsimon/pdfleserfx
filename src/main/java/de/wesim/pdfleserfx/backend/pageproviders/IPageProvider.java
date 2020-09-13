@@ -18,6 +18,6 @@ public interface IPageProvider {
     public Optional<Integer> getNumberOfPages();
 
     
-    public Image getPageAsImage(int page_number) throws IOException;
+    public Image getPageAsImage(int page_number, int dpi) throws IOException;
     
 }

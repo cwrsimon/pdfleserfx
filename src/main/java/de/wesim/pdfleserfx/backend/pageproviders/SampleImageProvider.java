@@ -50,7 +50,7 @@ public class SampleImageProvider implements IPageProvider {
     }
 
     @Override
-    public Image getPageAsImage(int page_number) throws IOException {
+    public Image getPageAsImage(int page_number, int dpi) throws IOException {
         return readImageFromPath(Paths.get(image_list[page_number]));
     }
 }

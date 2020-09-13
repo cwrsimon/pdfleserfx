@@ -6,12 +6,7 @@
 package de.wesim.pdfleserfx.frontend.mainview;
 
 import de.wesim.pdfleserfx.helpers.ThrowingSupplier;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -29,6 +24,7 @@ public class LoadImageTask extends Task<Image> {
         this.getter = getter;
         this.callback = callback;
     }
+
     // TODO Add error handler
     @Override
     protected Image call() throws Exception {
@@ -38,11 +34,15 @@ public class LoadImageTask extends Task<Image> {
     @Override
     protected void succeeded() {
         var value = getValue();
-        Platform.runLater( () -> {
-                callback.accept(value);    
+        Platform.runLater(() -> {
+            callback.accept(value);
         });
     }
-    
-    
-   
+
+    @Override
+    protected void failed() {
+        super.failed(); //To change body of generated methods, choose Tools | Templates.
+        getException().printStackTrace();
+    }
+
 }

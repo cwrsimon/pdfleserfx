@@ -32,7 +32,10 @@ public class Main extends Application {
     
     private MainLayout layout;
 
-    
+    /*
+      TODO
+      Display file name in main window title 
+    */
     @Override
     public void start(Stage stage) throws Exception {
         this.layout = new MainLayout();
@@ -89,17 +92,13 @@ public class Main extends Application {
         });
         stage.setScene(scene);
         stage.show();
-        
+
+        // TODO Issue a warning if file does not exist        
          // we should have at least on parameter
         var filename = getParameters().getRaw().get(0);
         var path = Paths.get(filename);
-        // TODO Issue a warning if file does not exist
-        //getParameters().getRaw().forEach(System.out::println);
        
         layout.openFile(path);
-        layout.loadFirst();
     }
-    
-    
 
 }
