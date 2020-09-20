@@ -6,6 +6,7 @@
 package de.wesim.pdfleserfx;
 
 import de.wesim.pdfleserfx.frontend.mainview.MainLayout;
+import java.awt.Toolkit;
 import java.nio.file.Paths;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -38,17 +39,23 @@ public class Main extends Application {
     */
     @Override
     public void start(Stage stage) throws Exception {
+        
+        var dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+        System.out.print("Resolution:");
+        System.out.println(dpi);
+        
         this.layout = new MainLayout();
 
         var scene = new Scene(layout, 640, 480);
 
         scene.setOnMouseClicked(e -> {
 
+            /*
             System.out.println("CC: " + e.getClickCount());
             System.out.println("Screen X: " + e.getScreenX() + ";" + e.getScreenY());
             System.out.println("Scene X: " + e.getSceneX() + ";" + e.getSceneY());
             System.out.println("X: " + e.getX() + ";" + e.getY());
-
+            */
             if (e.getButton() == MouseButton.PRIMARY) {
                 if (e.getClickCount() == 2) {
                     var old_val = stage.isFullScreen();

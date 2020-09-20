@@ -162,3 +162,4 @@ public class DisplayedImage extends ImageView {
     Property<Number> dpiProperty() {
         return this.dpiProperty;
     }
+}

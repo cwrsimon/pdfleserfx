@@ -23,6 +23,8 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
     compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.21'
+    compile group: 'org.kordamp.ikonli', name: 'ikonli-material-pack', version: '11.5.0'
+    compile group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: '11.5.0'
 
  //   testImplementation     'junit:junit:4.13'
 }
