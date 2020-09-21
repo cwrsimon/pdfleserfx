@@ -18,17 +18,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
-import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -41,29 +40,23 @@ public class MainLayout extends BorderPane {
 
     private final ToolBar toolbar;
     private final ColorPicker picker;
-    private final DisplayedImage iv2;
+    private final DisplayedImage image_container;
     private final ToggleButton fit_window_button;
 
     public void openFile(Path path) {
-        System.out.println(path.toAbsolutePath().toString());
         var content_provider = new PDFPageProvider(path);
-        this.iv2.setImageProvider(content_provider);
+        this.image_container.setImageProvider(content_provider);
         loadFirst();
     }
 
     public MainLayout() throws IOException {
 
-        var g = new StackPane();
-        //
-        this.iv2 = new DisplayedImage();
-        var contain = new HBox(iv2);
-        contain.setAlignment(Pos.CENTER);
-        g.getChildren().add(contain);
+        this.image_container = new DisplayedImage();
 
         this.toolbar = new ToolBar();
         this.picker = new ColorPicker(Color.web("#f3efc1"));
         this.picker.setPrefWidth(50);
-        this.picker.valueProperty().bindBidirectional(iv2.getColorProperty());
+        this.picker.valueProperty().bindBidirectional(image_container.getColorProperty());
 
         var open_button = createOpenButton();
 
@@ -79,12 +72,10 @@ public class MainLayout extends BorderPane {
 
         // TODO Show max page number
         var page_selector = new TextField("Page");
-        //page_selector.
         page_selector.setPrefWidth(50);
-//        page_selector.setEditable(true);
-//        page_selector.getValueFactory().valueProperty().bindBidirectional(this.iv2.pageProperty());
+
         Bindings.bindBidirectional(page_selector.textProperty(),
-                this.iv2.pageProperty(), new NumberStringConverter());
+                this.image_container.pageProperty(), new NumberStringConverter());
         toolbar.getItems().addAll(prev_button, page_selector, next_button);
         toolbar.getItems().add(new Separator());
 
@@ -98,34 +89,50 @@ public class MainLayout extends BorderPane {
         // TODO Add TextField for Modifying the resolution !
         var dpi_chooser = new ComboBox();
         dpi_chooser.setItems(FXCollections.observableArrayList(96, 100, 200, 300));
-        dpi_chooser.valueProperty().bindBidirectional(this.iv2.dpiProperty());
+        dpi_chooser.valueProperty().bindBidirectional(this.image_container.dpiProperty());
         toolbar.getItems().add(dpi_chooser);
 
         // TODO Add 
         var help_button = createHelpButton();
         toolbar.getItems().add(help_button);
         setTop(this.toolbar);
-        setCenter(g);
-
-        //addFitScreenBinding();
+        
+        var scrollpane = new ScrollPane(new StackPane(this.image_container));
+        scrollpane.fitToHeightProperty().bind(Bindings.createBooleanBinding(
+                () -> {
+                    return image_container.fitHeightProperty().isBound();
+                }, image_container.fitHeightProperty()));
+        
+        scrollpane.fitToWidthProperty().bind(Bindings.createBooleanBinding(
+                () -> {
+                    return image_container.fitWidthProperty().isBound();
+                }, image_container.fitWidthProperty()));
+        
+        setCenter(scrollpane);
+        setTop(this.toolbar);
     }
 
-    // TODO This binding must respect fullscreen mode
     private void addFitScreenBinding() {
         var back_reference = this;
 
-        iv2.fitWidthProperty().bind(back_reference.widthProperty());
-        iv2.fitHeightProperty().bind(Bindings.createDoubleBinding(() -> {
+        image_container.fitWidthProperty().bind(back_reference.widthProperty());
+        image_container.fitHeightProperty().bind(Bindings.createDoubleBinding(() -> {
 
             var border_height = back_reference.heightProperty().get();
-            var tb_height = toolbar.heightProperty().get();
+            double tb_height = 0.0;
+            if (toolbar.visibleProperty().get()) {
+                tb_height = toolbar.heightProperty().get();
+            }
 
             return border_height - tb_height;
 
-        }, back_reference.heightProperty(), toolbar.heightProperty()));
+        }, back_reference.heightProperty(), 
+            toolbar.heightProperty(), 
+            toolbar.visibleProperty()));
     }
 
     public void switchToFullscreen(boolean fullscreen) {
+        this.toolbar.setVisible(!fullscreen);
         if (fullscreen) {
             setTop(null);
         } else {
@@ -134,22 +141,21 @@ public class MainLayout extends BorderPane {
     }
 
     public void loadFirst() {
-        this.iv2.loadFirstImage();
+        this.image_container.loadFirstImage();
     }
 
     public void flipRight() {
-        this.iv2.loadNextImage();
+        this.image_container.loadNextImage();
     }
 
     public void flipLeft() {
-        this.iv2.loadPreviousImage();
+        this.image_container.loadPreviousImage();
     }
 
     private Button createOpenButton() {
         var file_icon = new FontIcon("gmi-folder-open");
         file_icon.setIconSize(DEFAULT_BUTTON_ICON_SIZE);
         var open_button = new Button("", file_icon);
-//        open_button.setPrefWidth(50);
         open_button.setOnAction(e -> {
             var file_chooser = new FileChooser();
             file_chooser.getExtensionFilters().addAll(
@@ -212,7 +218,7 @@ public class MainLayout extends BorderPane {
             }
 
         });
-        iv2.viewportProperty().bind(Bindings.createObjectBinding(() -> {
+        image_container.viewportProperty().bind(Bindings.createObjectBinding(() -> {
             var top_value = content.top_cut.textProperty().get();
             var bottom_value = content.bottom_cut.textProperty().get();
             var left_value = content.left_cut.textProperty().get();
@@ -234,11 +240,11 @@ public class MainLayout extends BorderPane {
             if (right_value != null && !right_value.isBlank()) {
                 right = Integer.valueOf(right_value);
             }
-            if (iv2.getImage() == null) {
+            if (image_container.getImage() == null) {
                 return null;
             }
-            var width = iv2.getImage().getWidth();
-            var height = iv2.getImage().getHeight();
+            var width = image_container.getImage().getWidth();
+            var height = image_container.getImage().getHeight();
             return new Rectangle2D(
                     left,
                     top,
@@ -272,12 +278,12 @@ public class MainLayout extends BorderPane {
             if (newV) {
                 addFitScreenBinding();
             } else {
-                this.iv2.fitHeightProperty().unbind();
-                this.iv2.fitWidthProperty().unbind();
-                this.iv2.setFitWidth(0);
-                this.iv2.setFitHeight(0);                
+                this.image_container.fitHeightProperty().unbind();
+                this.image_container.fitWidthProperty().unbind();
+                this.image_container.setFitWidth(0);
+                this.image_container.setFitHeight(0);                
             }
-            iv2.refresh();
+            image_container.refresh();
 
         });
         return button;

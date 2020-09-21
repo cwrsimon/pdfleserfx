@@ -5,8 +5,8 @@
  */
 package de.wesim.pdfleserfx.frontend.mainview;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,8 +37,10 @@ public class CropCustomMenuItem extends CustomMenuItem {
         right_cut.setPrefWidth(50);
         right_cut.setPromptText("Right");
 
-        
-        setContent(new VBox(top_cut, new HBox(left_cut, right_cut), bottom_cut));
+        var vertical_container = new VBox(top_cut, new HBox(left_cut, right_cut), bottom_cut);
+        vertical_container.setAlignment(Pos.TOP_CENTER);
+        vertical_container.setFillWidth(false);
+        setContent(vertical_container);
         getStyleClass().clear();
         setHideOnClick(false);
     }
