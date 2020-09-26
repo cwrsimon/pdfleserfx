@@ -5,9 +5,10 @@
  */
 package de.wesim.pdfleserfx;
 
-import de.wesim.pdfleserfx.frontend.mainview.MainLayout;
-import java.awt.Toolkit;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import de.wesim.pdfleserfx.frontend.mainview.MainLayout;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -20,10 +21,11 @@ import javafx.stage.Stage;
  * Integrate Spotless
  * i18n support
  * bookmarks
- * save settings for each book
+ * save settings for each book:
+ * https://github.com/dieselpoint/norm
+ * http://h2database.com
  * save list of last viewed files
  * logger
- * offer native resolution in dpi combobox
  * jlink image Windows
  * migrate to Maven
  * license file
@@ -49,11 +51,9 @@ public class Main extends Application {
     */
     @Override
     public void start(Stage stage) throws Exception {
-        
-        var dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-        System.out.print("Resolution:");
-        System.out.println(dpi);
-        
+                
+        stage.setFullScreenExitHint("Press ESC or double-click / double-tap in the center of the screen to exit fullscreen.");
+
         this.layout = new MainLayout();
 
         var scene = new Scene(layout, 640, 480);
@@ -64,7 +64,6 @@ public class Main extends Application {
                 if (e.getClickCount() == 2) {
                     var old_val = stage.isFullScreen();
                     stage.setFullScreen(!old_val);
-                    stage.setFullScreenExitHint("Press ESC or double-click / double-tap in the center of the screen to exit fullscreen.");
                     layout.switchToFullscreen(!old_val);
                     return;
                 } else if (e.getClickCount() == 1) {
@@ -94,21 +93,18 @@ public class Main extends Application {
             System.out.println(
                     e.getTouchCount()
             );
-//            if (e.getTouchCount() == 2) {
-//                ContextMenu cm = new ContextMenu(new MenuItem("Quit"));
-//                cm.show(scene.getWindow());
-//                
-//            }
         });
         stage.setScene(scene);
         stage.show();
 
-        // TODO Issue a warning if file does not exist        
-         // we should have at least on parameter
-        var filename = getParameters().getRaw().get(0);
+        // open file in sys.argv[0], if present
+        var params = getParameters().getRaw();
+        if (params.isEmpty()) return;
+        var filename = params.get(0);
         var path = Paths.get(filename);
-       
-        layout.openFile(path);
+        if (Files.exists(path)) {
+        	layout.openFile(path);
+        }
     }
 
 }

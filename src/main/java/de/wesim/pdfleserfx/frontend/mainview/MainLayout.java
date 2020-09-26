@@ -5,9 +5,13 @@
  */
 package de.wesim.pdfleserfx.frontend.mainview;
 
-import de.wesim.pdfleserfx.backend.pageproviders.PDFPageProvider;
 import java.io.IOException;
 import java.nio.file.Path;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import de.wesim.pdfleserfx.backend.ConfigurationService;
+import de.wesim.pdfleserfx.backend.pageproviders.PDFPageProvider;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -19,14 +23,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import org.kordamp.ikonli.javafx.FontIcon;
+import javafx.util.converter.NumberStringConverter;
 
 /**
  *
@@ -49,6 +52,8 @@ public class MainLayout extends BorderPane {
 
     public MainLayout() throws IOException {
 
+    	var config_service = ConfigurationService.getInstance();
+    	
         this.image_container = new DisplayedImage();
 
         this.toolbar = new ToolBar();
@@ -76,9 +81,6 @@ public class MainLayout extends BorderPane {
         page_selector.valueProperty().bindBidirectional(this.image_container.pageProperty());
         page_selector.itemsProperty().bind(this.image_container.pagesProperty());
         
-//        Bindings.bindBidirectional(
-//                page_selector.valueProperty(),
-//                this.image_container.pageProperty(), new NumberStringConverter());
         toolbar.getItems().addAll(prev_button, page_selector, next_button);
         toolbar.getItems().add(new Separator());
 
@@ -91,7 +93,10 @@ public class MainLayout extends BorderPane {
 
         // TODO Add TextField for Modifying the resolution !
         var dpi_chooser = new ComboBox<Number>();
-        dpi_chooser.setItems(FXCollections.observableArrayList(96, 100, 200, 300));
+        dpi_chooser.setPrefWidth(70);
+        dpi_chooser.setEditable(true);
+        dpi_chooser.setConverter(new NumberStringConverter());
+        dpi_chooser.setItems(config_service.getDpiResolutions());
         dpi_chooser.valueProperty().bindBidirectional(this.image_container.dpiProperty());
         toolbar.getItems().add(dpi_chooser);
 

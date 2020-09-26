@@ -5,7 +5,6 @@
  */
 package de.wesim.pdfleserfx.backend.pageproviders;
 
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -18,13 +17,10 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 public class PDFPageProvider implements IPageProvider {
 
     private final Path pdf_file;
-//    private final int dpi;
 
     
     public PDFPageProvider(Path pdf_file) {
         this.pdf_file = pdf_file;
-        // TODO Pre-Configure this when starting the application
-     //   this.dpi = Toolkit.getDefaultToolkit().getScreenResolution();
     }
     
     @Override
