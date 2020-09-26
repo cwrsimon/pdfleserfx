@@ -60,16 +60,11 @@ public class Main extends Application {
 
         scene.setOnMouseClicked(e -> {
 
-            /*
-            System.out.println("CC: " + e.getClickCount());
-            System.out.println("Screen X: " + e.getScreenX() + ";" + e.getScreenY());
-            System.out.println("Scene X: " + e.getSceneX() + ";" + e.getSceneY());
-            System.out.println("X: " + e.getX() + ";" + e.getY());
-            */
             if (e.getButton() == MouseButton.PRIMARY) {
                 if (e.getClickCount() == 2) {
                     var old_val = stage.isFullScreen();
                     stage.setFullScreen(!old_val);
+                    stage.setFullScreenExitHint("Press ESC or double-click / double-tap in the center of the screen to exit fullscreen.");
                     layout.switchToFullscreen(!old_val);
                     return;
                 } else if (e.getClickCount() == 1) {
@@ -80,12 +75,10 @@ public class Main extends Application {
                     var right_side = current_width / 3.0 * 2.0;
                     if (screenx <= left_side) {
                         layout.flipLeft();
-
                     } else if (screenx >= right_side) {
                         layout.flipRight();
-                        System.out.println("Rechts");
                     } else {
-                        System.out.println("Mitte");
+                    	; // do nothing for now
                     }
 
                 }
