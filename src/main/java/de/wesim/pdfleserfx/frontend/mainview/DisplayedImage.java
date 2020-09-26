@@ -7,10 +7,15 @@ package de.wesim.pdfleserfx.frontend.mainview;
 
 import de.wesim.pdfleserfx.backend.pageproviders.IPageProvider;
 import de.wesim.pdfleserfx.helpers.ThrowingSupplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorInput;
@@ -26,6 +31,8 @@ public class DisplayedImage extends ImageView {
 
     private ColorInput rect;
 
+    private final SimpleObjectProperty<ObservableList<Number>> pagesProperty = 
+            new SimpleObjectProperty<>();
     private final SimpleObjectProperty<Color> colorProperty
             = new SimpleObjectProperty<>(Color.web("#f3efc1"));
     private IPageProvider imageProvider;
@@ -83,6 +90,9 @@ public class DisplayedImage extends ImageView {
         var number_of_pages_opt = imageProvider.getNumberOfPages();
         if (number_of_pages_opt.isPresent()) {
             this.numer_of_pages = number_of_pages_opt.get();
+            var range = IntStream.rangeClosed(1, this.numer_of_pages)
+    .boxed().collect(Collectors.toList());
+            this.pagesProperty.setValue(FXCollections.observableArrayList(range));
         }
         System.out.println("page count:" + this.numer_of_pages);
         if (this.numer_of_pages != -1) {
@@ -122,19 +132,31 @@ public class DisplayedImage extends ImageView {
             rect.widthProperty().unbind();
             rect.heightProperty().bind(Bindings.createDoubleBinding(() -> {
                 var new_dimensions
-                        = calcHeightWidth(image.getWidth(), image.getHeight(), fitWidthProperty().get(), fitHeightProperty().get());
+                        = calculateDimensions(image, viewportProperty().getValue());
                 return new_dimensions[1];
-            }, fitWidthProperty(), fitHeightProperty()));
+            }, viewportProperty(), fitWidthProperty(), fitHeightProperty()));
 
             rect.widthProperty().bind(Bindings.createDoubleBinding(() -> {
                 var new_dimensions
-                        = calcHeightWidth(image.getWidth(), image.getHeight(), fitWidthProperty().get(), fitHeightProperty().get());
+                        = calculateDimensions(image, viewportProperty().getValue());
                 return new_dimensions[0];
-            }, fitWidthProperty(), fitHeightProperty()));
+            }, viewportProperty(), fitWidthProperty(), fitHeightProperty()));
         });
         task.run();
     }
 
+    private double[] calculateDimensions(Image image, Rectangle2D viewport_rect) {
+        var width_to_use = image.getWidth();
+                var height_to_use = image.getHeight();
+                if (viewport_rect != null) {
+                    width_to_use = viewport_rect.getWidth();
+                    height_to_use = viewport_rect.getHeight();
+                }
+         return calcHeightWidth(width_to_use, 
+                                height_to_use,
+                                fitWidthProperty().get(), fitHeightProperty().get());
+    }
+    
     /* Borrowed from
             https://github.com/javafxports/openjdk-jfx/blob/develop/modules/javafx.graphics/src/main/java/javafx/scene/image/ImageView.java
      */
@@ -162,4 +184,15 @@ public class DisplayedImage extends ImageView {
     Property<Number> dpiProperty() {
         return this.dpiProperty;
     }
+
+    public Integer getNumer_of_pages() {
+        return numer_of_pages;
+    }
+
+    public SimpleObjectProperty<ObservableList<Number>> pagesProperty() {
+        return pagesProperty;
+    }
+    
+    
+    
 }

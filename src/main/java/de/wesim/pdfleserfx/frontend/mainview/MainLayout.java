@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -27,7 +26,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.util.converter.NumberStringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -71,11 +69,16 @@ public class MainLayout extends BorderPane {
         var next_button = createNextButton();
 
         // TODO Show max page number
-        var page_selector = new TextField("Page");
-        page_selector.setPrefWidth(50);
+        var page_selector = new ComboBox<Number>();
+        page_selector.setPrefWidth(70);
 
-        Bindings.bindBidirectional(page_selector.textProperty(),
-                this.image_container.pageProperty(), new NumberStringConverter());
+        page_selector.setItems(FXCollections.observableArrayList(10,11,12,13,14));   
+        page_selector.valueProperty().bindBidirectional(this.image_container.pageProperty());
+        page_selector.itemsProperty().bind(this.image_container.pagesProperty());
+        
+//        Bindings.bindBidirectional(
+//                page_selector.valueProperty(),
+//                this.image_container.pageProperty(), new NumberStringConverter());
         toolbar.getItems().addAll(prev_button, page_selector, next_button);
         toolbar.getItems().add(new Separator());
 
@@ -87,7 +90,7 @@ public class MainLayout extends BorderPane {
                 toolbar.getItems().addAll(fit_window_button);
 
         // TODO Add TextField for Modifying the resolution !
-        var dpi_chooser = new ComboBox();
+        var dpi_chooser = new ComboBox<Number>();
         dpi_chooser.setItems(FXCollections.observableArrayList(96, 100, 200, 300));
         dpi_chooser.valueProperty().bindBidirectional(this.image_container.dpiProperty());
         toolbar.getItems().add(dpi_chooser);

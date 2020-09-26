@@ -16,8 +16,18 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 
 /**
- *
- * @author cwrsi
+ * TODO
+ * Integrate Spotless
+ * i18n support
+ * bookmarks
+ * save settings for each book
+ * save list of last viewed files
+ * logger
+ * offer native resolution in dpi combobox
+ * jlink image Windows
+ * migrate to Maven
+ * license file
+ * README
  */
 public class Main extends Application {
 
