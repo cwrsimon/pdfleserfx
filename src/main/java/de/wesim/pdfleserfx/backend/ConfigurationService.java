@@ -1,10 +1,12 @@
 package de.wesim.pdfleserfx.backend;
 
 import java.awt.Toolkit;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,10 +16,29 @@ public class ConfigurationService {
 	
 	private static ConfigurationService _instance;
 	private int preferred_dpi;
+    private Path app_config_directory;
 	
 	private ConfigurationService() {
-        this.preferred_dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-        if (this.preferred_dpi == 0) this.preferred_dpi = 96;
+            this.preferred_dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+            if (this.preferred_dpi == 0) this.preferred_dpi = 96;
+            
+            // home directory
+            // TODO APP_LOCAL on WIndows
+            var config_dirs_root = System.getenv("LOCALAPPDATA");
+            if (config_dirs_root == null) {
+                config_dirs_root = System.getProperty("user.home");   
+            }
+            if (config_dirs_root != null) {
+                var user_home = Paths.get(config_dirs_root);
+                this.app_config_directory = user_home.resolve(".pdfleserfx");
+                if (!Files.exists(this.app_config_directory)) {
+                    try {
+                        Files.createDirectory(this.app_config_directory);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }            
 	}
 	
 	public static ConfigurationService getInstance() {
