@@ -45,6 +45,7 @@ public class MainLayout extends BorderPane {
     private final ToggleButton fit_window_button;
 
     public void openFile(Path path) {
+    	ConfigurationService.getInstance().findDbEntryForFile(path);
         var content_provider = new PDFPageProvider(path);
         this.image_container.setImageProvider(content_provider);
         loadFirst();
@@ -182,7 +183,10 @@ public class MainLayout extends BorderPane {
         var quit_icon = new FontIcon("gmi-exit-to-app");
         quit_icon.setIconSize(DEFAULT_BUTTON_ICON_SIZE);
         var quit_button = new Button("", quit_icon);
-        quit_button.setOnAction(e -> Platform.exit());
+        quit_button.setOnAction(e -> {
+        	ConfigurationService.getInstance().getDb().close();
+        	Platform.exit();
+        	});
         return quit_button;
     }
 

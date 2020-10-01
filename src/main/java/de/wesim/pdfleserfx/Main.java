@@ -105,15 +105,6 @@ public class Main extends Application {
         var filename = params.get(0);
         var path = Paths.get(filename);
         if (Files.exists(path)) {
-             var db = ConfigurationService.getInstance().getDb();
-        var new_config = new BookConfiguration();
-        new_config.path = path.toAbsolutePath().toString();
-        new_config.dpi = 300;
-        System.out.println("Inserting");
-        db.createTable(BookConfiguration.class);
-        db.insert(new_config);
-        db.close();
-        
         	layout.openFile(path);
         }
        

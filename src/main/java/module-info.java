@@ -4,9 +4,10 @@ module de.wesim.pdfleserfx {
 	exports de.wesim.pdfleserfx;
 	exports de.wesim.pdfleserfx.backend;
 	exports de.wesim.pdfleserfx.frontend.mainview;
-        requires java.persistence;
-        requires norm;
-        requires java.desktop;
+    requires java.persistence;
+    requires java.sql;
+    requires transitive norm;
+    requires java.desktop;
 	requires javafx.base;
 	requires javafx.controls;
 	requires transitive javafx.graphics;
