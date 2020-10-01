@@ -5,6 +5,8 @@
  */
 package de.wesim.pdfleserfx;
 
+import de.wesim.pdfleserfx.backend.ConfigurationService;
+import de.wesim.pdfleserfx.backend.pojos.BookConfiguration;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -27,7 +29,6 @@ import javafx.stage.Stage;
  * save list of last viewed files
  * logger
  * jlink image Windows
- * migrate to Maven
  * license file
  * README
  */
@@ -97,14 +98,25 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+        
         // open file in sys.argv[0], if present
         var params = getParameters().getRaw();
         if (params.isEmpty()) return;
         var filename = params.get(0);
         var path = Paths.get(filename);
         if (Files.exists(path)) {
+             var db = ConfigurationService.getInstance().getDb();
+        var new_config = new BookConfiguration();
+        new_config.path = path.toAbsolutePath().toString();
+        new_config.dpi = 300;
+        System.out.println("Inserting");
+        db.createTable(BookConfiguration.class);
+        db.insert(new_config);
+        db.close();
+        
         	layout.openFile(path);
         }
+       
     }
 
 }
