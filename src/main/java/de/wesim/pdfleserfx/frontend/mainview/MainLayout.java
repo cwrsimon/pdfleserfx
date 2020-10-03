@@ -12,6 +12,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import de.wesim.pdfleserfx.backend.ConfigurationService;
 import de.wesim.pdfleserfx.backend.pageproviders.PDFPageProvider;
+import de.wesim.pdfleserfx.backend.pojos.BookConfiguration;
+import java.time.LocalDateTime;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -21,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
@@ -43,9 +46,13 @@ public class MainLayout extends BorderPane {
     private final ColorPicker picker;
     private final DisplayedImage image_container;
     private final ToggleButton fit_window_button;
+    private BookConfiguration current_settings;
+    private final ComboBox<Number> dpi_chooser;
+    private final ComboBox<Number> page_selector;
+    private CropCustomMenuItem content;
 
     public void openFile(Path path) {
-    	ConfigurationService.getInstance().findDbEntryForFile(path);
+    	this.current_settings = ConfigurationService.getInstance().findDbEntryForFile(path);
         var content_provider = new PDFPageProvider(path);
         this.image_container.setImageProvider(content_provider);
         loadFirst();
@@ -58,7 +65,7 @@ public class MainLayout extends BorderPane {
         this.image_container = new DisplayedImage();
 
         this.toolbar = new ToolBar();
-        this.picker = new ColorPicker(Color.web("#f3efc1"));
+        this.picker = new ColorPicker(Color.valueOf("0xf3efc1ff"));
         this.picker.setPrefWidth(50);
         this.picker.valueProperty().bindBidirectional(image_container.getColorProperty());
 
@@ -75,7 +82,7 @@ public class MainLayout extends BorderPane {
         var next_button = createNextButton();
 
         // TODO Show max page number
-        var page_selector = new ComboBox<Number>();
+        this.page_selector = new ComboBox<Number>();
         page_selector.setPrefWidth(70);
 
         page_selector.setItems(FXCollections.observableArrayList(10,11,12,13,14));   
@@ -93,7 +100,7 @@ public class MainLayout extends BorderPane {
                 toolbar.getItems().addAll(fit_window_button);
 
         // TODO Add TextField for Modifying the resolution !
-        var dpi_chooser = new ComboBox<Number>();
+        this.dpi_chooser = new ComboBox<>();
         dpi_chooser.setPrefWidth(70);
         dpi_chooser.setEditable(true);
         dpi_chooser.setConverter(new NumberStringConverter());
@@ -179,15 +186,30 @@ public class MainLayout extends BorderPane {
         return open_button;
     }
 
+    // React on window close / os shutdown event
     private Button createQuitButton() {
         var quit_icon = new FontIcon("gmi-exit-to-app");
         quit_icon.setIconSize(DEFAULT_BUTTON_ICON_SIZE);
         var quit_button = new Button("", quit_icon);
         quit_button.setOnAction(e -> {
+                saveCurrentSettings();
         	ConfigurationService.getInstance().getDb().close();
         	Platform.exit();
         	});
         return quit_button;
+    }
+    
+    private void saveCurrentSettings() {
+        this.current_settings.background_color = this.picker.getValue().toString();
+        this.current_settings.dpi = this.dpi_chooser.getValue().intValue();
+        this.current_settings.current_page = this.page_selector.getValue().intValue();
+        this.current_settings.last_read = LocalDateTime.now();
+        this.current_settings.crop_top = Integer.valueOf(this.content.top_cut.getText());
+        this.current_settings.crop_left = Integer.valueOf(this.content.left_cut.getText());
+        this.current_settings.crop_right = Integer.valueOf(this.content.right_cut.getText());
+        this.current_settings.crop_bottom = Integer.valueOf(this.content.bottom_cut.getText());
+
+        ConfigurationService.getInstance().getDb().update(this.current_settings);
     }
 
     // TODO Create keyboard shortcut
@@ -208,7 +230,8 @@ public class MainLayout extends BorderPane {
     }
 
     private Button createCropButton() {
-        var content = new CropCustomMenuItem();
+        // TODO REname
+        this.content = new CropCustomMenuItem();
         var context_menu = new ContextMenu(content);
 
         context_menu.setAutoHide(true);

@@ -5,12 +5,14 @@
  */
 package de.wesim.pdfleserfx.backend.pojos;
 
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-// Add Indexes
+// TODO Find a better name
+// TODO Add Indexes
 @Table(name="book_configuration")
 public class BookConfiguration {
 	
@@ -32,9 +34,12 @@ public class BookConfiguration {
     public int crop_bottom = 0;
     @Column
     public int crop_left = 0;
+    @Column
+    public int current_page = 0;
+    @Column
+    public int dpi;
     
-    
-	@Column
-	public int dpi;
+    @Column
+    public LocalDateTime last_read;
 
 }

@@ -79,12 +79,20 @@ public class ConfigurationService {
         return this.db;
     }
     
-    public void findDbEntryForFile(Path file) {
+    public BookConfiguration findDbEntryForFile(Path file) {
     	var name = file.getFileName().toString();
     	List<BookConfiguration> entries = 
-    			this.db.where("filename=?", name).results(BookConfiguration.class);
+    			this.db.where("filename=?", name)
+                                .results(BookConfiguration.class);
     	System.out.println(entries.size());
-    	
+    	if (entries.size() > 0) {
+            return entries.get(0);
+        }
+        var new_instance = new BookConfiguration();
+        new_instance.filename = name;
+        db.insert(new_instance);
+        System.out.println("Neue ID: " + new_instance.id);
+        return new_instance;
     	/*
         var db = ConfigurationService.getInstance().getDb();
         var new_config = new BookConfiguration();
