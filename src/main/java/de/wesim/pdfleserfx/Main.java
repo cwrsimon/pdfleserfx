@@ -10,7 +10,7 @@ import de.wesim.pdfleserfx.backend.pojos.BookConfiguration;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import de.wesim.pdfleserfx.frontend.mainview.MainLayout;
+import de.wesim.pdfleserfx.frontend.mainview.MainView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -44,7 +44,7 @@ public class Main extends Application {
         launch(args);
     }
     
-    private MainLayout layout;
+    private MainView layout;
 
     /*
       TODO
@@ -55,7 +55,7 @@ public class Main extends Application {
                 
         stage.setFullScreenExitHint("Press ESC or double-click / double-tap in the center of the screen to exit fullscreen.");
 
-        this.layout = new MainLayout();
+        this.layout = new MainView();
 
         var scene = new Scene(layout, 640, 480);
 

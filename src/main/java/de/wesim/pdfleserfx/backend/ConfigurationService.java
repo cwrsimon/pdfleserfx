@@ -23,6 +23,7 @@ public class ConfigurationService {
     private int preferred_dpi;
     private Path app_config_directory;
     private final Database db;
+	private String h2_file;
 
     private ConfigurationService() {
         this.preferred_dpi = Toolkit.getDefaultToolkit().getScreenResolution();
@@ -48,9 +49,10 @@ public class ConfigurationService {
                 }
             }
         }
-        var h2_file = app_config_directory.resolve("config.db").toAbsolutePath().toString();
+        this.h2_file = app_config_directory.resolve("config.db").toAbsolutePath().toString();
+        /*
         this.db = new Database();
-        this.db.setJdbcUrl("jdbc:h2:" + h2_file + ";database_to_upper=false");
+        this.db.setJdbcUrl( + ";database_to_upper=false");
         this.db.setUser("sa");
         this.db.setPassword("");
         // create tables if necessary
@@ -60,6 +62,7 @@ public class ConfigurationService {
         } catch (DbException e) {
         	db.createTable(BookConfiguration.class);
         }
+        */
     }
 
     public static ConfigurationService getInstance() {
@@ -105,4 +108,10 @@ public class ConfigurationService {
         db.close();
         */
     }
+
+	public String getH2_file() {
+		return h2_file;
+	}
+    
+    
 }

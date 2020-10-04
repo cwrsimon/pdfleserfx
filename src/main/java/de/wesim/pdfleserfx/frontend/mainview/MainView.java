@@ -23,7 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
@@ -34,11 +33,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 
-/**
- *
- * @author cwrsi
- */
-public class MainLayout extends BorderPane {
+
+public class MainView extends BorderPane {
 
     private static final int DEFAULT_BUTTON_ICON_SIZE = 16;
 
@@ -56,9 +52,23 @@ public class MainLayout extends BorderPane {
         var content_provider = new PDFPageProvider(path);
         this.image_container.setImageProvider(content_provider);
         loadFirst();
+        applySettings();
     }
 
-    public MainLayout() throws IOException {
+    private void applySettings() {
+    	if (this.current_settings.background_color != null) {
+    		this.picker.valueProperty().set(Color.valueOf(this.current_settings.background_color));
+    	}
+    	this.dpi_chooser.valueProperty().set(this.current_settings.dpi);
+    	this.page_selector.valueProperty().set(this.current_settings.current_page);
+        this.content.top_cut.textProperty().set( String.valueOf(this.current_settings.crop_top));
+        this.content.left_cut.textProperty().set( String.valueOf(this.current_settings.crop_left));
+        this.content.right_cut.textProperty().set( String.valueOf(this.current_settings.crop_right));
+        this.content.bottom_cut.textProperty().set( String.valueOf(this.current_settings.crop_bottom ));
+		
+	}
+
+	public MainView() throws IOException {
 
     	var config_service = ConfigurationService.getInstance();
     	
@@ -200,10 +210,13 @@ public class MainLayout extends BorderPane {
     }
     
     private void saveCurrentSettings() {
+    	if (this.current_settings == null) return;
+    	// TODO ABsichern
         this.current_settings.background_color = this.picker.getValue().toString();
         this.current_settings.dpi = this.dpi_chooser.getValue().intValue();
         this.current_settings.current_page = this.page_selector.getValue().intValue();
-        this.current_settings.last_read = LocalDateTime.now();
+        // FIXME Reintegrate me later
+        //        this.current_settings.last_read = LocalDateTime.now();
         this.current_settings.crop_top = Integer.valueOf(this.content.top_cut.getText());
         this.current_settings.crop_left = Integer.valueOf(this.content.left_cut.getText());
         this.current_settings.crop_right = Integer.valueOf(this.content.right_cut.getText());

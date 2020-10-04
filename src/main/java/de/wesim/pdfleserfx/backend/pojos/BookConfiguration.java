@@ -5,41 +5,23 @@
  */
 package de.wesim.pdfleserfx.backend.pojos;
 
-import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 // TODO Find a better name
 // TODO Add Indexes
-@Table(name="book_configuration")
 public class BookConfiguration {
-	
-    @Id
-	@GeneratedValue
-	public long id;
 
-    @Column
 	public String filename;
 
-    @Column
     public String background_color;
     
-    @Column
     public int crop_top = 0;
-    @Column
     public int crop_right = 0;
-    @Column
     public int crop_bottom = 0;
-    @Column
     public int crop_left = 0;
-    @Column
-    public int current_page = 0;
-    @Column
-    public int dpi;
-    
-    @Column
-    public LocalDateTime last_read;
+    public int current_page = 1;
+    public int dpi = 96;
+  
+    // TODO Reintegrate later
+//    @Column
+//    public LocalDateTime last_read;
 
 }
