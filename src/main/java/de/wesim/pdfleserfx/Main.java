@@ -6,7 +6,8 @@
 package de.wesim.pdfleserfx;
 
 import de.wesim.pdfleserfx.backend.ConfigurationService;
-import de.wesim.pdfleserfx.backend.pojos.BookConfiguration;
+import de.wesim.pdfleserfx.backend.DBService;
+import de.wesim.pdfleserfx.backend.pojos.BookSettings;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -23,9 +24,9 @@ import javafx.stage.Stage;
  * Integrate Spotless
  * i18n support
  * bookmarks
- * save settings for each book:
- * https://github.com/dieselpoint/norm
- * http://h2database.com
+ * table of contents
+ * open last read file
+ * offer quick navigation to 5 last read books
  * save list of last viewed files
  * logger
  * jlink image Windows
@@ -98,6 +99,8 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+        // init DB
+        DBService.getInstance().createSchema();
         
         // open file in sys.argv[0], if present
         var params = getParameters().getRaw();

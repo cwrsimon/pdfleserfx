@@ -6,12 +6,17 @@
 package de.wesim.pdfleserfx.backend.pojos;
 
 // TODO Find a better name
+
+import java.time.LocalDateTime;
+
 // TODO Add Indexes
-public class BookConfiguration {
+public class BookSettings {
 
-	public String filename;
+    public String filename;
 
-    public String background_color;
+    public String path;
+        
+    public String background_color = null;
     
     public int crop_top = 0;
     public int crop_right = 0;
@@ -19,9 +24,6 @@ public class BookConfiguration {
     public int crop_left = 0;
     public int current_page = 1;
     public int dpi = 96;
-  
-    // TODO Reintegrate later
-//    @Column
-//    public LocalDateTime last_read;
+    public LocalDateTime last_read = LocalDateTime.now();
 
 }

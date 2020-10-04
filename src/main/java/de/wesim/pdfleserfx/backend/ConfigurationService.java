@@ -1,10 +1,5 @@
 package de.wesim.pdfleserfx.backend;
 
-import com.dieselpoint.norm.Database;
-import com.dieselpoint.norm.DbException;
-
-import de.wesim.pdfleserfx.backend.pojos.BookConfiguration;
-
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,8 +16,7 @@ public class ConfigurationService {
     private static ConfigurationService _instance;
     private int preferred_dpi;
     private Path app_config_directory;
-    private final Database db;
-	private String h2_file;
+    private final String h2_file;
 
     private ConfigurationService() {
         this.preferred_dpi = Toolkit.getDefaultToolkit().getScreenResolution();
@@ -78,37 +71,7 @@ public class ConfigurationService {
         return FXCollections.observableArrayList(resolutions);
     }
 
-    public Database getDb() {
-        return this.db;
-    }
-    
-    public BookConfiguration findDbEntryForFile(Path file) {
-    	var name = file.getFileName().toString();
-    	List<BookConfiguration> entries = 
-    			this.db.where("filename=?", name)
-                                .results(BookConfiguration.class);
-    	System.out.println(entries.size());
-    	if (entries.size() > 0) {
-            return entries.get(0);
-        }
-        var new_instance = new BookConfiguration();
-        new_instance.filename = name;
-        db.insert(new_instance);
-        System.out.println("Neue ID: " + new_instance.id);
-        return new_instance;
-    	/*
-        var db = ConfigurationService.getInstance().getDb();
-        var new_config = new BookConfiguration();
-        new_config.path = path.toAbsolutePath().toString();
-        new_config.dpi = 300;
-        System.out.println("Inserting");
-        db.createTable(BookConfiguration.class);
-        db.
-        db.insert(new_config);
-        db.close();
-        */
-    }
-
+   
 	public String getH2_file() {
 		return h2_file;
 	}

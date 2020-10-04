@@ -22,6 +22,12 @@
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
 			<version>2.0.21</version>
+		 <exclusions>
+		  <exclusion>
+		   <groupId>commons-logging</groupId>
+		   <artifactId>commons-logging</artifactId>
+		  </exclusion>
+		 </exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
 		<dependency>
@@ -54,7 +60,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<release>14</release>
+					<release>15</release>
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
@@ -70,5 +76,8 @@
 	</build>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <java.version>15</java.version>
+	 <maven.compiler.source>15</maven.compiler.source>
+	 <maven.compiler.target>15</maven.compiler.target>
 	</properties>
 </project>
