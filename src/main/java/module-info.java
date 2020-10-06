@@ -5,8 +5,8 @@ module de.wesim.pdfleserfx {
 	exports de.wesim.pdfleserfx.backend.pojos;
 	exports de.wesim.pdfleserfx.backend;
 	exports de.wesim.pdfleserfx.frontend.mainview;
-        requires java.sql;
-        requires java.desktop;
+	requires java.sql;
+	requires java.desktop;
 	requires javafx.base;
 	requires javafx.controls;
 	requires transitive javafx.graphics;
@@ -15,6 +15,6 @@ module de.wesim.pdfleserfx {
 	requires org.kordamp.iconli.core;
 	requires org.kordamp.ikonli.material;
 	requires org.kordamp.ikonli.javafx;
-	requires spring.jdbc;    
-        requires spring.tx;
+	requires spring.jdbc;
+	requires spring.tx;
 }

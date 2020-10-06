@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+//TODO License Header
 package de.wesim.pdfleserfx.frontend.mainview;
 
 import de.wesim.pdfleserfx.backend.pageproviders.IPageProvider;
@@ -29,170 +25,164 @@ import javafx.scene.paint.Color;
  */
 public class DisplayedImage extends ImageView {
 
-    private ColorInput rect;
+	private ColorInput rect;
 
-    private final SimpleObjectProperty<ObservableList<Number>> pagesProperty = 
-            new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<Color> colorProperty
-            = new SimpleObjectProperty<>(Color.web("#f3efc1"));
-    private IPageProvider imageProvider;
-    private Integer numer_of_pages = -1;
+	private final SimpleObjectProperty<ObservableList<Number>> pagesProperty = new SimpleObjectProperty<>();
+	private final SimpleObjectProperty<Color> colorProperty = new SimpleObjectProperty<>(Color.web("#f3efc1"));
+	private IPageProvider imageProvider;
+	private Integer numer_of_pages = -1;
 
-    private final SimpleIntegerProperty dpiProperty = new SimpleIntegerProperty(96);
-    private final SimpleIntegerProperty pageProperty = new SimpleIntegerProperty(0);
-    
-    public DisplayedImage() {
+	private final SimpleIntegerProperty dpiProperty = new SimpleIntegerProperty(96);
+	private final SimpleIntegerProperty pageProperty = new SimpleIntegerProperty(0);
 
-        setPreserveRatio(true);
-        setSmooth(true);
-        setCache(true);
+	public DisplayedImage() {
 
-        var blend = createBlend();
-        setEffect(blend);
+		setPreserveRatio(true);
+		setSmooth(true);
+		setCache(true);
 
-        colorProperty.addListener((o, old, newV) -> {
-            this.rect.setPaint(newV);
-        });
+		var blend = createBlend();
+		setEffect(blend);
 
-        dpiProperty.addListener((obs, oldV, newV) -> {
-            refresh();
-        });
+		colorProperty.addListener((o, old, newV) -> {
+			this.rect.setPaint(newV);
+		});
 
-        pageProperty.addListener((obs, oldV, newV ) -> {
-            if (newV.intValue() < 1) return;
-            System.out.println(oldV + ";" + newV);
-            loadImage();
-        });
+		dpiProperty.addListener((obs, oldV, newV) -> {
+			refresh();
+		});
 
-    }
+		pageProperty.addListener((obs, oldV, newV) -> {
+			if (newV.intValue() < 1)
+				return;
+			System.out.println(oldV + ";" + newV);
+			loadImage();
+		});
 
-    public void refresh() {
-        loadImage();
-    }
+	}
 
-    private Blend createBlend() {
-        var b = new Blend();
-        b.setMode(BlendMode.MULTIPLY);
-        this.rect = new ColorInput();
-        rect.setX(0);
-        rect.setY(0);
-        rect.setPaint(colorProperty.getValue());
-        b.setBottomInput(rect);
-        return b;
-    }
+	public void refresh() {
+		loadImage();
+	}
 
-    public SimpleObjectProperty<Color> getColorProperty() {
-        return colorProperty;
-    }
+	private Blend createBlend() {
+		var b = new Blend();
+		b.setMode(BlendMode.MULTIPLY);
+		this.rect = new ColorInput();
+		rect.setX(0);
+		rect.setY(0);
+		rect.setPaint(colorProperty.getValue());
+		b.setBottomInput(rect);
+		return b;
+	}
 
-    public void loadFirstImage() {
-        pageProperty.set(0);
-        var number_of_pages_opt = imageProvider.getNumberOfPages();
-        if (number_of_pages_opt.isPresent()) {
-            this.numer_of_pages = number_of_pages_opt.get();
-            var range = IntStream.rangeClosed(1, this.numer_of_pages)
-    .boxed().collect(Collectors.toList());
-            this.pagesProperty.setValue(FXCollections.observableArrayList(range));
-        }
-        System.out.println("page count:" + this.numer_of_pages);
-        if (this.numer_of_pages != -1) {
-            System.out.println("Hey");
-            pageProperty.set(1);
-        }
-    }
+	public SimpleObjectProperty<Color> getColorProperty() {
+		return colorProperty;
+	}
 
-    public void loadNextImage() {
-        var current_page = pageProperty.get();
-        if (current_page > -1) {
-            var candidate = current_page + 1;
-            if (candidate <= this.numer_of_pages) {
-                pageProperty.set(candidate);
-            }
-        }
-    }
+	public void loadFirstImage() {
+		pageProperty.set(0);
+		var number_of_pages_opt = imageProvider.getNumberOfPages();
+		if (number_of_pages_opt.isPresent()) {
+			this.numer_of_pages = number_of_pages_opt.get();
+			var range = IntStream.rangeClosed(1, this.numer_of_pages).boxed().collect(Collectors.toList());
+			this.pagesProperty.setValue(FXCollections.observableArrayList(range));
+		}
+		System.out.println("page count:" + this.numer_of_pages);
+		if (this.numer_of_pages != -1) {
+			System.out.println("Hey");
+			pageProperty.set(1);
+		}
+	}
 
-    public void loadPreviousImage() {
-        var current_page = pageProperty.get();
-        if (current_page > -1) {
-            var candidate = current_page - 1;
-            if (candidate > 0) {
-                pageProperty.set(candidate);
-            }
-        }
-    }
+	public void loadNextImage() {
+		var current_page = pageProperty.get();
+		if (current_page > -1) {
+			var candidate = current_page + 1;
+			if (candidate <= this.numer_of_pages) {
+				pageProperty.set(candidate);
+			}
+		}
+	}
 
-    private void loadImage() {
-        var page = pageProperty.get();
-        System.out.println("Loading page:" + page);
+	public void loadPreviousImage() {
+		var current_page = pageProperty.get();
+		if (current_page > -1) {
+			var candidate = current_page - 1;
+			if (candidate > 0) {
+				pageProperty.set(candidate);
+			}
+		}
+	}
 
-        final ThrowingSupplier<Image> getter = () -> imageProvider.getPageAsImage((page - 1), dpiProperty.get());
-        var task = new LoadImageTask(getter, image -> {
-            setImage(image);
-            rect.heightProperty().unbind();
-            rect.widthProperty().unbind();
-            rect.heightProperty().bind(Bindings.createDoubleBinding(() -> {
-                var new_dimensions
-                        = calculateDimensions(image, viewportProperty().getValue());
-                return new_dimensions[1];
-            }, viewportProperty(), fitWidthProperty(), fitHeightProperty()));
+	private void loadImage() {
+		var page = pageProperty.get();
+		System.out.println("Loading page:" + page);
 
-            rect.widthProperty().bind(Bindings.createDoubleBinding(() -> {
-                var new_dimensions
-                        = calculateDimensions(image, viewportProperty().getValue());
-                return new_dimensions[0];
-            }, viewportProperty(), fitWidthProperty(), fitHeightProperty()));
-        });
-        task.run();
-    }
+		final ThrowingSupplier<Image> getter = () -> imageProvider.getPageAsImage((page - 1), dpiProperty.get());
+		var task = new LoadImageTask(getter, image -> {
+			setImage(image);
+			rect.heightProperty().unbind();
+			rect.widthProperty().unbind();
+			rect.heightProperty().bind(Bindings.createDoubleBinding(() -> {
+				var new_dimensions = calculateDimensions(image, viewportProperty().getValue());
+				return new_dimensions[1];
+			}, viewportProperty(), fitWidthProperty(), fitHeightProperty()));
 
-    private double[] calculateDimensions(Image image, Rectangle2D viewport_rect) {
-        var width_to_use = image.getWidth();
-                var height_to_use = image.getHeight();
-                if (viewport_rect != null) {
-                    width_to_use = viewport_rect.getWidth();
-                    height_to_use = viewport_rect.getHeight();
-                }
-         return calcHeightWidth(width_to_use, 
-                                height_to_use,
-                                fitWidthProperty().get(), fitHeightProperty().get());
-    }
-    
-    /* Borrowed from
-            https://github.com/javafxports/openjdk-jfx/blob/develop/modules/javafx.graphics/src/main/java/javafx/scene/image/ImageView.java
-     */
-    private double[] calcHeightWidth(double w, double h, double localFitWidth, double localFitHeight) {
-        if (isPreserveRatio() && w > 0 && h > 0 && (localFitWidth > 0 || localFitHeight > 0)) {
-            if (localFitWidth <= 0 || (localFitHeight > 0 && localFitWidth * h > localFitHeight * w)) {
-                w = w * localFitHeight / h;
-                h = localFitHeight;
-            } else {
-                h = h * localFitWidth / w;
-                w = localFitWidth;
-            }
-        }
-        return new double[]{w, h};
-    }
+			rect.widthProperty().bind(Bindings.createDoubleBinding(() -> {
+				var new_dimensions = calculateDimensions(image, viewportProperty().getValue());
+				return new_dimensions[0];
+			}, viewportProperty(), fitWidthProperty(), fitHeightProperty()));
+		});
+		task.run();
+	}
 
-    public void setImageProvider(IPageProvider imageProvider) {
-        this.imageProvider = imageProvider;
-    }
+	private double[] calculateDimensions(Image image, Rectangle2D viewport_rect) {
+		var width_to_use = image.getWidth();
+		var height_to_use = image.getHeight();
+		if (viewport_rect != null) {
+			width_to_use = viewport_rect.getWidth();
+			height_to_use = viewport_rect.getHeight();
+		}
+		return calcHeightWidth(width_to_use, height_to_use, fitWidthProperty().get(), fitHeightProperty().get());
+	}
 
-    Property<Number> pageProperty() {
-        return this.pageProperty;
-    }
+	/*
+	 * Borrowed from
+	 * https://github.com/javafxports/openjdk-jfx/blob/develop/modules/javafx.
+	 * graphics/src/main/java/javafx/scene/image/ImageView.java
+	 */
+	private double[] calcHeightWidth(double w, double h, double localFitWidth, double localFitHeight) {
+		if (isPreserveRatio() && w > 0 && h > 0 && (localFitWidth > 0 || localFitHeight > 0)) {
+			if (localFitWidth <= 0 || (localFitHeight > 0 && localFitWidth * h > localFitHeight * w)) {
+				w = w * localFitHeight / h;
+				h = localFitHeight;
+			} else {
+				h = h * localFitWidth / w;
+				w = localFitWidth;
+			}
+		}
+		return new double[]{w, h};
+	}
 
-    Property<Number> dpiProperty() {
-        return this.dpiProperty;
-    }
+	public void setImageProvider(IPageProvider imageProvider) {
+		this.imageProvider = imageProvider;
+	}
 
-    public Integer getNumer_of_pages() {
-        return numer_of_pages;
-    }
+	Property<Number> pageProperty() {
+		return this.pageProperty;
+	}
 
-    public SimpleObjectProperty<ObservableList<Number>> pagesProperty() {
-        return pagesProperty;
-    }
-    
-    
-    
+	Property<Number> dpiProperty() {
+		return this.dpiProperty;
+	}
+
+	public Integer getNumer_of_pages() {
+		return numer_of_pages;
+	}
+
+	public SimpleObjectProperty<ObservableList<Number>> pagesProperty() {
+		return pagesProperty;
+	}
+
 }

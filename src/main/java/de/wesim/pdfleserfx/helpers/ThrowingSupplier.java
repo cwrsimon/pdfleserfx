@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+//TODO License Header
 package de.wesim.pdfleserfx.helpers;
 
 import java.io.IOException;
@@ -13,5 +9,5 @@ import java.io.IOException;
  */
 @FunctionalInterface
 public interface ThrowingSupplier<T> {
-   T get() throws IOException;
+	T get() throws IOException;
 }
