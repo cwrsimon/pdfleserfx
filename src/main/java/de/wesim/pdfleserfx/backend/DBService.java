@@ -3,7 +3,9 @@ package de.wesim.pdfleserfx.backend;
 
 import de.wesim.pdfleserfx.backend.pojos.BookSettings;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -107,4 +109,22 @@ public class DBService {
 				current_settings.crop_left, current_settings.crop_right, current_settings.filename);
 		return rows_updated;
 	}
+
+	public List<Path> getLast5Files() {
+
+		try {
+			var entries = this.jdbc_template.query("select path from book_settings order by last_read desc LIMIT 5;",
+					(result_set, row_num) -> {
+						var path_string = result_set.getString("path");
+						return Paths.get(path_string);
+					});
+			return entries;
+
+		} catch (DataAccessException e) {
+			// TODO Do something reasonable here....
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }

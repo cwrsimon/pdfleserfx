@@ -1,9 +1,7 @@
 //TODO License Header
 package de.wesim.pdfleserfx;
 
-import de.wesim.pdfleserfx.backend.ConfigurationService;
 import de.wesim.pdfleserfx.backend.DBService;
-import de.wesim.pdfleserfx.backend.pojos.BookSettings;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -16,9 +14,20 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 
 /**
- * TODO i18n support bookmarks table of contents open last
- * read file offer quick navigation to 5 last read books save list of last
- * viewed files logger jlink image Windows license file README
+ * TODO i18n support
+ *
+ * bookmarks
+ *
+ * table of contents
+ *
+ * logging
+ *
+ * jlink image for Windowa
+ *
+ *
+ * license file
+ *
+ * README
  */
 public class Main extends Application {
 
@@ -32,17 +41,13 @@ public class Main extends Application {
 
 	private MainView layout;
 
-	/*
-	 * TODO Display file name in main window title
-	 */
 	@Override
 	public void start(Stage stage) throws Exception {
-
 		stage.setFullScreenExitHint(
 				"Press ESC or double-click / double-tap in the center of the screen to exit fullscreen.");
 
 		this.layout = new MainView();
-
+		stage.titleProperty().bind(this.layout.documentNameProperty());
 		var scene = new Scene(layout, 640, 480);
 
 		scene.setOnMouseClicked(e -> {
@@ -77,6 +82,7 @@ public class Main extends Application {
 		});
 
 		scene.setOnTouchPressed(e -> {
+
 			System.out.println(e.getTouchCount());
 		});
 		stage.setScene(scene);
@@ -84,15 +90,19 @@ public class Main extends Application {
 
 		// init DB
 		DBService.getInstance().createSchema();
+		var last_5_read_files = DBService.getInstance().getLast5Files();
+		this.layout.setLast5Read(last_5_read_files);
+		last_5_read_files.forEach(System.out::println);
 
 		// open file in sys.argv[0], if present
 		var params = getParameters().getRaw();
-		if (params.isEmpty())
-			return;
-		var filename = params.get(0);
-		var path = Paths.get(filename);
-		if (Files.exists(path)) {
-			layout.openFile(path);
+		if (!params.isEmpty()) {
+			var filename = params.get(0);
+			var path = Paths.get(filename);
+			if (Files.exists(path))
+				layout.openFile(path);
+		} else if (!last_5_read_files.isEmpty()) {
+			layout.openFile(last_5_read_files.get(0));
 		}
 
 	}

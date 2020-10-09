@@ -17,4 +17,5 @@ module de.wesim.pdfleserfx {
 	requires org.kordamp.ikonli.javafx;
 	requires spring.jdbc;
 	requires spring.tx;
+		requires org.controlsfx.controls;
 }

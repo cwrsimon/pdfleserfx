@@ -11,8 +11,11 @@ import de.wesim.pdfleserfx.backend.DBService;
 import de.wesim.pdfleserfx.backend.pageproviders.PDFPageProvider;
 import de.wesim.pdfleserfx.backend.pojos.BookSettings;
 import java.time.LocalDateTime;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
@@ -20,15 +23,20 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
+import org.controlsfx.control.PopOver;
 
 public class MainView extends BorderPane {
 
@@ -42,13 +50,21 @@ public class MainView extends BorderPane {
 	private final ComboBox<Number> dpi_chooser;
 	private final ComboBox<Number> page_selector;
 	private CropCustomMenuItem content;
+	private List<Path> last_5_read_files;
+	private StringProperty documentNameProperty = new SimpleStringProperty("No file open");
 
 	public void openFile(Path path) {
+		// save settings of book currently open
+		if (this.current_settings != null) {
+			saveCurrentSettings();
+		}
 		this.current_settings = DBService.getInstance().findDbEntryForFile(path);
 		var content_provider = new PDFPageProvider(path);
 		this.image_container.setImageProvider(content_provider);
 		loadFirst();
 		applySettings();
+		documentNameProperty.setValue(path.toString());
+
 	}
 
 	private void applySettings() {
@@ -83,9 +99,12 @@ public class MainView extends BorderPane {
 
 		var open_button = createOpenButton();
 
+		var open_last_5_button = createOpenLast5Button();
+
 		var quit_button = createQuitButton();
 
 		toolbar.getItems().add(open_button);
+		toolbar.getItems().add(open_last_5_button);
 		toolbar.getItems().add(quit_button);
 		toolbar.getItems().add(new Separator());
 
@@ -176,6 +195,38 @@ public class MainView extends BorderPane {
 		this.image_container.loadPreviousImage();
 	}
 
+	private Button createOpenLast5Button() {
+		var file_icon = new FontIcon("gmi-looks-5");
+
+		file_icon.setIconSize(DEFAULT_BUTTON_ICON_SIZE);
+		var button = new Button("", file_icon);
+		button.setTooltip(new Tooltip("last 5 read files"));
+		button.setOnAction(e -> {
+			var context_menu = new ContextMenu();
+			this.last_5_read_files.forEach(item -> {
+				var menu_item = new MenuItem(item.toString());
+				menu_item.setOnAction(click -> openFile(item));
+				context_menu.getItems().add(menu_item);
+
+			}
+
+			);
+
+			if (!context_menu.isShowing()) {
+
+				context_menu.show(button, Side.BOTTOM, 0, 0);
+
+			} else {
+
+				context_menu.hide();
+
+			}
+
+		});
+		return button;
+
+	}
+
 	private Button createOpenButton() {
 		var file_icon = new FontIcon("gmi-folder-open");
 		file_icon.setIconSize(DEFAULT_BUTTON_ICON_SIZE);
@@ -206,6 +257,7 @@ public class MainView extends BorderPane {
 		return quit_button;
 	}
 
+	// TODO Save more frequently!
 	private void saveCurrentSettings() {
 		if (this.current_settings == null) {
 			return;
@@ -302,6 +354,18 @@ public class MainView extends BorderPane {
 		var help_icon = new FontIcon("gmi-touch-app");
 		help_icon.setIconSize(DEFAULT_BUTTON_ICON_SIZE);
 		var help_button = new Button("", help_icon);
+		help_button.setOnAction(e -> {
+
+			var popover = new PopOver();
+			popover.setContentNode(
+					new VBox(new Label("Double-tap in the middle of the screen to enter / exit fullscreen."),
+							new Label("Tap in the leftmost third of the screen to flip to previous page."),
+							new Label("Tap in the rightmost third of the screen to flip to next page.")
+
+					));
+			popover.show(help_button);
+		});
+
 		// TODO Create popup with instructions for touch use
 		return help_button;
 	}
@@ -325,5 +389,13 @@ public class MainView extends BorderPane {
 
 		});
 		return button;
+	}
+
+	public void setLast5Read(List<Path> last_5_read_files) {
+		this.last_5_read_files = last_5_read_files;
+	}
+
+	public StringProperty documentNameProperty() {
+		return this.documentNameProperty;
 	}
 }
