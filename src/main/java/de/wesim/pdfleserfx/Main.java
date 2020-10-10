@@ -1,4 +1,4 @@
-//TODO License Header
+// Licensed under GNU General Public License v3.0, see 'LICENSE' for details.
 package de.wesim.pdfleserfx;
 
 import de.wesim.pdfleserfx.backend.DBService;

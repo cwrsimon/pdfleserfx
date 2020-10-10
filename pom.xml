@@ -93,11 +93,19 @@
                         <eclipse />
                         <!--<removeUnusedImports />  self-explanatory -->
                         <licenseHeader>
-                            <content>//TODO License Header</content>  <!-- or <file>${basedir}/license-header</file> -->
+                            <content>// Licensed under GNU General Public License v3.0, see 'LICENSE' for details.</content>
                         </licenseHeader>
                     </java>
                 </configuration>
             </plugin>
+            <plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+	            <artifactId>exec-maven-plugin</artifactId>
+	            <version>3.0.0</version>
+	            <configuration>
+	                <mainClass>de.wesim.pdfleserfx.Main</mainClass>
+	            </configuration>
+	        </plugin>
         </plugins>
     </build>
     <properties>
