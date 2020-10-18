@@ -40,20 +40,9 @@ public class DBService {
 	}
 
 	public boolean createSchema() {
-		var sql = """
-				create table if not exists book_settings (
-					filename varchar(255) primary key,
-					path varchar(255),
-					background_color varchar(255),
-					crop_top integer,
-					crop_right integer,
-					crop_bottom integer,
-					crop_left   integer,
-					current_page    integer,
-					dpi integer,
-					last_read timestamp
-				);
-				""";
+		var sql = "create table if not exists book_settings ( "
+					+ " filename varchar(255) primary key, path varchar(255), background_color varchar(255), " 
+					+ "crop_top integer, crop_right integer, crop_bottom integer, crop_left   integer, current_page    integer, dpi integer, last_read timestamp );";
 		this.jdbc_template.execute(sql);
 		return true;
 	}
@@ -84,27 +73,17 @@ public class DBService {
 		} catch (DataAccessException e) {
 			System.out.println("Nothing found for " + name);
 			var path = file.toAbsolutePath().toString();
-			this.jdbc_template.update("""
-					insert into book_settings (filename,path,last_read)
-					values (?,?,?);
-					""", name, path, LocalDateTime.now());
+			this.jdbc_template.update("insert into book_settings (filename,path,last_read) values (?,?,?);", name, path, LocalDateTime.now());
 		}
 		return null;
 	}
 
 	public int update(BookSettings current_settings) {
-		var rows_updated = this.jdbc_template.update("""
-				update book_settings
-				set dpi = ?,
-				last_read = ?,
-				background_color = ?,
-				current_page = ?,
-				crop_top = ?,
-				crop_bottom = ?,
-				crop_left = ?,
-				crop_right = ?
-				where filename = ?;
-				""", current_settings.dpi, current_settings.last_read, current_settings.background_color,
+		var rows_updated = this.jdbc_template.update(
+				"update book_settings set dpi = ?, last_read = ?, background_color = ?, "
+				+ "current_page = ?, crop_top = ?, "
+				+ "crop_bottom = ?, crop_left = ?, "
+				+ "crop_right = ? where filename = ?; ", current_settings.dpi, current_settings.last_read, current_settings.background_color,
 				current_settings.current_page, current_settings.crop_top, current_settings.crop_bottom,
 				current_settings.crop_left, current_settings.crop_right, current_settings.filename);
 		return rows_updated;
