@@ -28,7 +28,7 @@ This should get you started:
 ./mvnw compile exec:java
 ```
 
-If you want to use pdfleserfx more permanently, you might want to create an application image using **jpackage**:
+If you want to use pdfleserfx more permanently, you can create a single jar that can executed with a simple double-click:
 ```
-TODO
+./mvnw clean package
 ```
